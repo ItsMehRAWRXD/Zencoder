@@ -6,7 +6,6 @@
 
 // Forward declarations
 class AESCBC;
-class FileUtils;
 class StubGenerator;
 class DragDropHandler;
 
