@@ -4,13 +4,20 @@
 #include <vector>
 #include <cstdint>
 
-// Obscured enumerations
+// Obscured enumerations for encryption processes
 enum class Fx7z9Process {
-    D4t0,
-    Qx3r,
-    K5bc,
-    M2tr,
-    Z1ha
+    D4t0,    // No encryption
+    Qx3r,    // Basic XOR
+    K5bc,    // AES-CBC
+    M2tr,    // AES-CTR
+    Z1ha,    // ChaCha20
+    P3rc,    // RC4
+    B2fs,    // Blowfish
+    T5sh,    // Twofish
+    S7pt,    // Serpent
+    C9la,    // Camellia
+    G4cm,    // GCM
+    P1y5     // Poly1305
 };
 
 class Z3Processor {
@@ -38,7 +45,12 @@ public:
     // Utility methods with random names
     std::vector<uint8_t> loadResource(const std::string& path);
     bool saveResource(const std::string& path, const std::vector<uint8_t>& content);
+    
+    // Additional methods used in implementation
+    Fx7z9Process getProcessMode() const;
 
 private:
     std::vector<uint8_t> getRandomNonce(size_t size);
+    Fx7z9Process m_processMode;
+    std::vector<uint8_t> m_seedValue;
 };

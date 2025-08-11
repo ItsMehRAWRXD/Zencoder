@@ -1,18 +1,12 @@
-#include <iostream>
-#include "menu.h"
+#ifndef PACKER_H
+#define PACKER_H
 
-int main() {
-    while (true) {
-        displayMenu();
-        int choice;
-        std::cin >> choice;
+#include <string>
+#include <vector>
+#include <cstdint>
 
-        if (choice == 0) {
-            std::cout << "Exiting the application." << std::endl;
-            break;
-        }
+// Forward declarations from include/packer.h
+enum class Fx7z9Process;
+class Z3Processor;
 
-        handleUserChoice(choice);
-    }
-    return 0;
-}
+#endif // PACKER_H
