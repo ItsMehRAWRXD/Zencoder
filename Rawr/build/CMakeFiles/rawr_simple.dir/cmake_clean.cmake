@@ -1,0 +1,40 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/rawr_simple.dir/link.d"
+  "CMakeFiles/rawr_simple.dir/encryption/aes_cbc.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/aes_cbc.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/aes_ctr.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/aes_ctr.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/blowfish.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/blowfish.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/camellia.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/camellia.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/chacha20.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/chacha20.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/encryption_base.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/encryption_base.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/gcm.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/gcm.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/poly1305.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/poly1305.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/rc4.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/rc4.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/serpent.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/serpent.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/encryption/twofish.cpp.o"
+  "CMakeFiles/rawr_simple.dir/encryption/twofish.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/simple_main.cpp.o"
+  "CMakeFiles/rawr_simple.dir/simple_main.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/utils/file_utils.cpp.o"
+  "CMakeFiles/rawr_simple.dir/utils/file_utils.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/utils/logging.cpp.o"
+  "CMakeFiles/rawr_simple.dir/utils/logging.cpp.o.d"
+  "CMakeFiles/rawr_simple.dir/utils/pe_parser.cpp.o"
+  "CMakeFiles/rawr_simple.dir/utils/pe_parser.cpp.o.d"
+  "bin/rawr_simple"
+  "bin/rawr_simple.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/rawr_simple.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

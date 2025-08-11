@@ -1,12 +1,20 @@
-#include <iostream>
-#include "menu.h"
+#include "camellia.h"
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the Encryption and Packing Tool!" << std::endl;
+// Placeholder implementation for Camellia
+Camellia::Camellia(const std::vector<uint8_t>& key) {
+    // Initialize Camellia with key
+}
 
-    // Display the menu and handle user input
-    displayMenu();
+Camellia::~Camellia() {
+    // Cleanup
+}
 
-    return 0;
+std::vector<uint8_t> Camellia::encrypt(const std::vector<uint8_t>& plaintext) {
+    // TODO: Implement Camellia encryption
+    return plaintext;
+}
+
+std::vector<uint8_t> Camellia::decrypt(const std::vector<uint8_t>& ciphertext) {
+    // TODO: Implement Camellia decryption
+    return ciphertext;
 }

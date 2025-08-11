@@ -193,13 +193,13 @@ void Z3Processor::runTask67(const std::string& inputPath, const std::string& out
         std::vector<uint8_t> packageData = loadResource(inputPath);
         if (packageData.empty()) {
             std::cerr << "Failed to read package file: " << inputPath << std::endl;
-            return false;
+            return;
         }
         
         // Ensure file is large enough for a header
         if (packageData.size() < 10) {
             std::cerr << "Invalid package file: too small" << std::endl;
-            return false;
+            return;
         }
         
         // Check file signature
@@ -211,13 +211,13 @@ void Z3Processor::runTask67(const std::string& inputPath, const std::string& out
             
         if (signature != Z3_FILE_SIGNATURE) {
             std::cerr << "Invalid package file: wrong signature" << std::endl;
-            return false;
+            return;
         }
         
         // Check format version
         if (packageData[4] != Z3_FORMAT_VERSION) {
             std::cerr << "Unsupported package format version" << std::endl;
-            return false;
+            return;
         }
         
         // Get encryption mode
@@ -302,10 +302,10 @@ void Z3Processor::runTask67(const std::string& inputPath, const std::string& out
             outFile.close();
         }
         
-        return true;
+        return;
     } catch (const std::exception& e) {
         std::cerr << "Error in runTask67: " << e.what() << std::endl;
-        return false;
+        return;
     }
 }
 
@@ -442,6 +442,8 @@ bool Z3Processor::task219(const std::string& targetPath, const std::string& labe
         std::string expectedSectionName = "." + label.substr(0, 7);
         bool found = false;
         std::vector<uint8_t> componentData;
+        size_t componentOffset = 0;
+        uint32_t componentSize = 0;
         
         // Check all sections
         auto* sectionHeaders = parser.getSectionHeaders();
@@ -478,7 +480,7 @@ bool Z3Processor::task219(const std::string& targetPath, const std::string& labe
                         }
                         
                         if (labelMatch) {
-                            uint32_t componentSize = 
+                            componentSize = 
                                 (static_cast<uint32_t>(sectionData[8]) << 0) |
                                 (static_cast<uint32_t>(sectionData[9]) << 8) |
                                 (static_cast<uint32_t>(sectionData[10]) << 16) |
@@ -489,6 +491,7 @@ bool Z3Processor::task219(const std::string& targetPath, const std::string& labe
                                     sectionData.begin() + 12,
                                     sectionData.begin() + 12 + componentSize
                                 );
+                                componentOffset = fileOffset;
                                 found = true;
                                 break;
                             }

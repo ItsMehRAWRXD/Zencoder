@@ -1,12 +1,20 @@
-#include <iostream>
-#include "menu.h"
+#include "rc4.h"
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the Encryption and Packing Tool!" << std::endl;
+// Placeholder implementation for RC4
+RC4::RC4(const std::vector<uint8_t>& key) {
+    // Initialize RC4 with key
+}
 
-    // Display the menu and handle user input
-    displayMenu();
+RC4::~RC4() {
+    // Cleanup
+}
 
-    return 0;
+std::vector<uint8_t> RC4::encrypt(const std::vector<uint8_t>& plaintext) {
+    // TODO: Implement RC4 encryption
+    return plaintext;
+}
+
+std::vector<uint8_t> RC4::decrypt(const std::vector<uint8_t>& ciphertext) {
+    // RC4 is symmetric
+    return encrypt(ciphertext);
 }

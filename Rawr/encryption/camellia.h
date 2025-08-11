@@ -1,18 +1,19 @@
-#include <iostream>
-#include "menu.h"
+#ifndef CAMELLIA_H
+#define CAMELLIA_H
 
-int main() {
-    while (true) {
-        displayMenu();
-        int choice;
-        std::cin >> choice;
+#include <vector>
+#include <cstdint>
 
-        if (choice == 0) {
-            std::cout << "Exiting the application." << std::endl;
-            break;
-        }
+class Camellia {
+public:
+    Camellia(const std::vector<uint8_t>& key);
+    ~Camellia();
+    
+    std::vector<uint8_t> encrypt(const std::vector<uint8_t>& plaintext);
+    std::vector<uint8_t> decrypt(const std::vector<uint8_t>& ciphertext);
 
-        handleUserChoice(choice);
-    }
-    return 0;
-}
+private:
+    std::vector<uint8_t> key;
+};
+
+#endif // CAMELLIA_H

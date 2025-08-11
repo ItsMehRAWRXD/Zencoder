@@ -1,18 +1,20 @@
-#include <iostream>
-#include "menu.h"
+#ifndef LOGGING_H
+#define LOGGING_H
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the File Encryption and Packing Tool!" << std::endl;
+#include <string>
 
-    // Display the menu and handle user input
-    while (true) {
-        int choice = displayMenu();
-        if (choice == 0) {
-            break; // Exit the application
-        }
-        handleUserSelection(choice);
-    }
+namespace Logging {
 
-    return 0;
-}
+enum class LogLevel {
+    DEBUG,
+    INFO,
+    WARNING,
+    ERROR
+};
+
+void setLogLevel(LogLevel level);
+void log(LogLevel level, const std::string& message);
+
+} // namespace Logging
+
+#endif // LOGGING_H

@@ -1,12 +1,19 @@
-#include <iostream>
-#include "menu.h"
+#ifndef TWOFISH_H
+#define TWOFISH_H
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the Encryption and Packing Tool!" << std::endl;
+#include <vector>
+#include <cstdint>
 
-    // Display the menu and handle user input
-    displayMenu();
+class Twofish {
+public:
+    Twofish(const std::vector<uint8_t>& key);
+    ~Twofish();
+    
+    std::vector<uint8_t> encrypt(const std::vector<uint8_t>& plaintext);
+    std::vector<uint8_t> decrypt(const std::vector<uint8_t>& ciphertext);
 
-    return 0;
-}
+private:
+    std::vector<uint8_t> key;
+};
+
+#endif // TWOFISH_H

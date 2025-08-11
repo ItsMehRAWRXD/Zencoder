@@ -1,17 +1,20 @@
-#include <iostream>
-#include "menu.h"
+#include "serpent.h"
 
-int main() {
-    while (true) {
-        displayMenu();
-        int choice;
-        std::cin >> choice;
+// Placeholder implementation for Serpent
+Serpent::Serpent(const std::vector<uint8_t>& key) {
+    // Initialize Serpent with key
+}
 
-        if (choice == 0) {
-            break; // Exit the application
-        }
+Serpent::~Serpent() {
+    // Cleanup
+}
 
-        handleUserSelection(choice);
-    }
-    return 0;
+std::vector<uint8_t> Serpent::encrypt(const std::vector<uint8_t>& plaintext) {
+    // TODO: Implement Serpent encryption
+    return plaintext;
+}
+
+std::vector<uint8_t> Serpent::decrypt(const std::vector<uint8_t>& ciphertext) {
+    // TODO: Implement Serpent decryption
+    return ciphertext;
 }

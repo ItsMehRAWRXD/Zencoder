@@ -1,18 +1,20 @@
-#include <iostream>
-#include "menu.h"
+#include "gcm.h"
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the Encryption and Packing Tool!" << std::endl;
+// Placeholder implementation for GCM
+GCM::GCM(const std::vector<uint8_t>& key) {
+    // Initialize GCM with key
+}
 
-    // Display the menu and handle user input
-    while (true) {
-        int choice = displayMenu();
-        if (choice == 0) {
-            break; // Exit the application
-        }
-        handleUserSelection(choice);
-    }
+GCM::~GCM() {
+    // Cleanup
+}
 
-    return 0;
+std::vector<uint8_t> GCM::encrypt(const std::vector<uint8_t>& plaintext, const std::vector<uint8_t>& aad) {
+    // TODO: Implement GCM encryption
+    return plaintext;
+}
+
+std::vector<uint8_t> GCM::decrypt(const std::vector<uint8_t>& ciphertext, const std::vector<uint8_t>& aad) {
+    // TODO: Implement GCM decryption
+    return ciphertext;
 }

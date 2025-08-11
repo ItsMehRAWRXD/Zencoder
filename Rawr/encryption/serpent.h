@@ -1,12 +1,19 @@
-#include <iostream>
-#include "menu.h"
+#ifndef SERPENT_H
+#define SERPENT_H
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the File Encryption and Packing Tool!" << std::endl;
+#include <vector>
+#include <cstdint>
 
-    // Display the menu and handle user input
-    displayMenu();
+class Serpent {
+public:
+    Serpent(const std::vector<uint8_t>& key);
+    ~Serpent();
+    
+    std::vector<uint8_t> encrypt(const std::vector<uint8_t>& plaintext);
+    std::vector<uint8_t> decrypt(const std::vector<uint8_t>& ciphertext);
 
-    return 0;
-}
+private:
+    std::vector<uint8_t> key;
+};
+
+#endif // SERPENT_H

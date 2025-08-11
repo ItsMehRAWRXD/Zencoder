@@ -1,12 +1,20 @@
-#include <iostream>
-#include "menu.h"
+#include "chacha20.h"
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the File Encryption and Packing Tool!" << std::endl;
+// Placeholder implementation for ChaCha20
+ChaCha20::ChaCha20(const std::vector<uint8_t>& key, const std::vector<uint8_t>& nonce) {
+    // Initialize ChaCha20 with key and nonce
+}
 
-    // Display the menu and handle user input
-    displayMenu();
+ChaCha20::~ChaCha20() {
+    // Cleanup
+}
 
-    return 0;
+std::vector<uint8_t> ChaCha20::encrypt(const std::vector<uint8_t>& plaintext) {
+    // TODO: Implement ChaCha20 encryption
+    return plaintext;
+}
+
+std::vector<uint8_t> ChaCha20::decrypt(const std::vector<uint8_t>& ciphertext) {
+    // ChaCha20 is symmetric
+    return encrypt(ciphertext);
 }

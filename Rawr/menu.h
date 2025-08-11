@@ -52,6 +52,10 @@ std::string getInputPath(const std::string& prompt);
 std::vector<std::string> getMultipleInputPaths();
 std::vector<uint8_t> getHexSeed();
 
+// Stub generator submenu
+void displayStubGeneratorMenu();
+void handleStubGeneratorChoice(int choice);
+
 #endif // MENU_H
 
 #pragma once

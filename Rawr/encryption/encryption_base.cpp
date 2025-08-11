@@ -1,18 +1,10 @@
-#include <iostream>
-#include "menu.h"
+#include "encryption_base.h"
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the Encryption and Packing Tool!" << std::endl;
+// Base class implementation for encryption algorithms
+EncryptionBase::EncryptionBase() {
+    // Initialize base encryption
+}
 
-    // Display the menu and handle user input
-    while (true) {
-        int choice = displayMenu();
-        if (choice == 0) {
-            break; // Exit the application
-        }
-        handleUserSelection(choice);
-    }
-
-    return 0;
+EncryptionBase::~EncryptionBase() {
+    // Cleanup
 }

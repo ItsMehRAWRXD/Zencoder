@@ -1,12 +1,20 @@
-#include <iostream>
-#include "menu.h"
+#include "blowfish.h"
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the Encryption and Packing Tool!" << std::endl;
+// Placeholder implementation for Blowfish
+Blowfish::Blowfish(const std::vector<uint8_t>& key) {
+    // Initialize Blowfish with key
+}
 
-    // Display the menu and handle user input
-    displayMenu();
+Blowfish::~Blowfish() {
+    // Cleanup
+}
 
-    return 0;
+std::vector<uint8_t> Blowfish::encrypt(const std::vector<uint8_t>& plaintext) {
+    // TODO: Implement Blowfish encryption
+    return plaintext;
+}
+
+std::vector<uint8_t> Blowfish::decrypt(const std::vector<uint8_t>& ciphertext) {
+    // TODO: Implement Blowfish decryption
+    return ciphertext;
 }
