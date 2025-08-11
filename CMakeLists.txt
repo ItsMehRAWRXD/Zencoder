@@ -71,6 +71,8 @@ set(SOURCES
     src/encryption/aes_cbc.cpp
     src/utils/file_utils.cpp
     src/utils/logging.cpp
+    src/stub_generator.cpp
+    src/drag_drop.cpp
 )
 
 # Header files
@@ -81,6 +83,8 @@ set(HEADERS
     src/encryption/aes_cbc.h
     src/utils/file_utils.h
     src/utils/logging.h
+    src/stub_generator.h
+    src/drag_drop.h
     types/enums.h
 )
 
