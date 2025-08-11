@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Encryption">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encryption\Headers">
+      <UniqueIdentifier>{58B9A0B5-1234-4567-8901-234567890ABC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encryption\Source">
+      <UniqueIdentifier>{58B9A0B5-5678-4567-8901-234567890DEF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{1234567-89AB-CDEF-0123-456789ABCDEF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\Headers">
+      <UniqueIdentifier>{2345678-9ABC-DEF0-1234-56789ABCDEF0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\Source">
+      <UniqueIdentifier>{3456789-ABCD-EF01-2345-6789ABCDEF01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types">
+      <UniqueIdentifier>{456789A-BCDE-F012-3456-789ABCDEF012}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="packer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\aes_cbc.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\aes_ctr.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\blowfish.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\camellia.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\chacha20.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\encryption_base.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\gcm.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\poly1305.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\rc4.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\serpent.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\encryption\twofish.cpp">
+      <Filter>Encryption\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\file_utils.cpp">
+      <Filter>Utilities\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\logging.cpp">
+      <Filter>Utilities\Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="packer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\packer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\aes_cbc.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\aes_ctr.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\blowfish.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\camellia.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\chacha20.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\encryption_base.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\gcm.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\poly1305.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\rc4.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\serpent.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\encryption\twofish.h">
+      <Filter>Encryption\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\types\enums.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="types\enums.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\file_utils.h">
+      <Filter>Utilities\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\logging.h">
+      <Filter>Utilities\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\file_utils.h">
+      <Filter>Utilities\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\logging.h">
+      <Filter>Utilities\Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
