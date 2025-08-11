@@ -7,13 +7,15 @@
 #include <random>
 #include <algorithm>
 #include <cstring>
+#include "utils/pe_parser.h"
+#include "encryption/aes_cbc.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
 // External function for memory protection
-extern void registerProtectedMemoryRegion(DWORD processId, void* startAddress, SIZE_T size);
+extern void registerProtectedMemoryRegion(DWORD processId, void* startAddress, size_t size);
 
 // File signature and format constants
 const uint32_t Z3_FILE_SIGNATURE = 0x3A334E5A; // "Z3:" in little-endian
@@ -78,7 +80,7 @@ Fx7z9Process Z3Processor::getProcessMode() const {
     return m_processMode;
 }
 
-bool Z3Processor::runTask42(const std::vector<std::string>& sourceItems, const std::string& outputPath) {
+void Z3Processor::runTask42(const std::vector<std::string>& sourceItems, const std::string& outputPath) {
     // Combine multiple files into a single encrypted package
     try {
         // Create header for the package
@@ -172,20 +174,19 @@ bool Z3Processor::runTask42(const std::vector<std::string>& sourceItems, const s
         std::ofstream outFile(outputPath, std::ios::binary);
         if (!outFile) {
             std::cerr << "Failed to create output file: " << outputPath << std::endl;
-            return false;
+            return;
         }
         
         outFile.write(reinterpret_cast<const char*>(packageData.data()), packageData.size());
         outFile.close();
         
-        return true;
+        std::cout << "Package created successfully: " << outputPath << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Error in runTask42: " << e.what() << std::endl;
-        return false;
     }
 }
 
-bool Z3Processor::runTask67(const std::string& inputPath, const std::string& outputDir) {
+void Z3Processor::runTask67(const std::string& inputPath, const std::string& outputDir) {
     // Extract files from an encrypted package
     try {
         // Read the package file
@@ -365,40 +366,46 @@ bool Z3Processor::task104(const std::string& targetPath, const std::string& labe
             return false;
         }
         
-        // Find space for the new section/component
-        // This is a simplified approach - real PE modification requires parsing headers
-        
-        // For this example, we'll append the component to the end of the file
-        // In a real implementation, you would add a proper PE section
-        
-        // Create component header (8-byte label + 4-byte size)
-        std::vector<uint8_t> componentHeader(12);
-        
-        // Copy label (up to 8 chars)
-        for (size_t i = 0; i < 8 && i < label.length(); i++) {
-            componentHeader[i] = static_cast<uint8_t>(label[i]);
-        }
-        
-        // Set component size
-        uint32_t componentSize = static_cast<uint32_t>(componentData.size());
-        componentHeader[8] = (componentSize >> 0) & 0xFF;
-        componentHeader[9] = (componentSize >> 8) & 0xFF;
-        componentHeader[10] = (componentSize >> 16) & 0xFF;
-        componentHeader[11] = (componentSize >> 24) & 0xFF;
-        
-        // Append component header and data to the PE file
-        peData.insert(peData.end(), componentHeader.begin(), componentHeader.end());
-        peData.insert(peData.end(), componentData.begin(), componentData.end());
-        
-        // Write the modified PE file
-        std::ofstream outFile(targetPath, std::ios::binary);
-        if (!outFile) {
-            std::cerr << "Failed to create output file: " << targetPath << std::endl;
+        // Use PE parser to add a proper section
+        PEParser parser;
+        if (!parser.loadPE(peData)) {
+            std::cerr << "Failed to parse PE file" << std::endl;
             return false;
         }
         
-        outFile.write(reinterpret_cast<const char*>(peData.data()), peData.size());
-        outFile.close();
+        // Create section name from label (max 8 chars)
+        std::string sectionName = "." + label.substr(0, 7);
+        
+        // Prepare section data with component header
+        std::vector<uint8_t> sectionData;
+        
+        // Add component header (label + size)
+        sectionData.resize(12, 0);
+        for (size_t i = 0; i < label.length() && i < 8; i++) {
+            sectionData[i] = static_cast<uint8_t>(label[i]);
+        }
+        
+        uint32_t componentSize = static_cast<uint32_t>(componentData.size());
+        sectionData[8] = (componentSize >> 0) & 0xFF;
+        sectionData[9] = (componentSize >> 8) & 0xFF;
+        sectionData[10] = (componentSize >> 16) & 0xFF;
+        sectionData[11] = (componentSize >> 24) & 0xFF;
+        
+        // Append the actual component data
+        sectionData.insert(sectionData.end(), componentData.begin(), componentData.end());
+        
+        // Add the new section with appropriate characteristics
+        DWORD characteristics = IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ;
+        if (!parser.addSection(sectionName, sectionData, characteristics)) {
+            std::cerr << "Failed to add section to PE file" << std::endl;
+            return false;
+        }
+        
+        // Save the modified PE file
+        if (!parser.save(targetPath)) {
+            std::cerr << "Failed to save modified PE file" << std::endl;
+            return false;
+        }
         
         return true;
     } catch (const std::exception& e) {
@@ -424,53 +431,77 @@ bool Z3Processor::task219(const std::string& targetPath, const std::string& labe
             return false;
         }
         
-        // Find the component with the given label
-        bool found = false;
-        size_t componentOffset = 0;
+        // Use PE parser to find the component in sections
+        PEParser parser;
+        if (!parser.loadPE(peData)) {
+            std::cerr << "Failed to parse PE file" << std::endl;
+            return false;
+        }
         
-        // Scan for component label at the end of the file
-        // In a real implementation, you would parse the PE sections properly
-        for (size_t i = 0; i + 12 + 1 <= peData.size(); i++) {
-            bool labelMatch = true;
-            for (size_t j = 0; j < 8 && j < label.length(); j++) {
-                if (peData[i + j] != static_cast<uint8_t>(label[j])) {
-                    labelMatch = false;
-                    break;
-                }
-            }
+        // Look for the section containing our component
+        std::string expectedSectionName = "." + label.substr(0, 7);
+        bool found = false;
+        std::vector<uint8_t> componentData;
+        
+        // Check all sections
+        auto* sectionHeaders = parser.getSectionHeaders();
+        auto* ntHeaders = parser.getNTHeaders();
+        
+        for (int i = 0; i < ntHeaders->FileHeader.NumberOfSections; i++) {
+            char sectionName[9] = {0};
+            memcpy(sectionName, sectionHeaders[i].Name, 8);
             
-            if (labelMatch) {
-                // Found a potential match - check if it's a valid component header
-                uint32_t componentSize = 
-                    (static_cast<uint32_t>(peData[i + 8]) << 0) |
-                    (static_cast<uint32_t>(peData[i + 9]) << 8) |
-                    (static_cast<uint32_t>(peData[i + 10]) << 16) |
-                    (static_cast<uint32_t>(peData[i + 11]) << 24);
+            // Check if this section might contain our component
+            if (strstr(sectionName, label.substr(0, 7).c_str()) != nullptr ||
+                strcmp(sectionName, expectedSectionName.c_str()) == 0) {
+                
+                // Read section data
+                uint32_t sectionRVA = sectionHeaders[i].VirtualAddress;
+                uint32_t sectionSize = sectionHeaders[i].SizeOfRawData;
+                uint32_t fileOffset = sectionHeaders[i].PointerToRawData;
+                
+                if (fileOffset + sectionSize <= peData.size()) {
+                    // Check for component header in this section
+                    std::vector<uint8_t> sectionData(
+                        peData.begin() + fileOffset,
+                        peData.begin() + fileOffset + sectionSize
+                    );
                     
-                if (i + 12 + componentSize <= peData.size()) {
-                    found = true;
-                    componentOffset = i;
-                    break;
+                    // Verify component header
+                    if (sectionData.size() >= 12) {
+                        bool labelMatch = true;
+                        for (size_t j = 0; j < label.length() && j < 8; j++) {
+                            if (sectionData[j] != static_cast<uint8_t>(label[j])) {
+                                labelMatch = false;
+                                break;
+                            }
+                        }
+                        
+                        if (labelMatch) {
+                            uint32_t componentSize = 
+                                (static_cast<uint32_t>(sectionData[8]) << 0) |
+                                (static_cast<uint32_t>(sectionData[9]) << 8) |
+                                (static_cast<uint32_t>(sectionData[10]) << 16) |
+                                (static_cast<uint32_t>(sectionData[11]) << 24);
+                            
+                            if (12 + componentSize <= sectionData.size()) {
+                                componentData.assign(
+                                    sectionData.begin() + 12,
+                                    sectionData.begin() + 12 + componentSize
+                                );
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
         
         if (!found) {
-            std::cerr << "Component with label '" << label << "' not found" << std::endl;
+            std::cerr << "Component with label '" << label << "' not found in PE sections" << std::endl;
             return false;
         }
-        
-        // Get component data
-        uint32_t componentSize = 
-            (static_cast<uint32_t>(peData[componentOffset + 8]) << 0) |
-            (static_cast<uint32_t>(peData[componentOffset + 9]) << 8) |
-            (static_cast<uint32_t>(peData[componentOffset + 10]) << 16) |
-            (static_cast<uint32_t>(peData[componentOffset + 11]) << 24);
-            
-        std::vector<uint8_t> componentData(
-            peData.begin() + componentOffset + 12,
-            peData.begin() + componentOffset + 12 + componentSize
-        );
         
         // Set processing mode and seed
         Fx7z9Process oldMode = m_processMode;
@@ -527,32 +558,34 @@ bool Z3Processor::task219(const std::string& targetPath, const std::string& labe
 bool Z3Processor::task317(const std::string& targetPath) {
     // Obfuscate PE import table
     try {
-        // This is a placeholder for PE import table obfuscation
-        // In a real implementation, this would parse and modify the PE import table
-        
-        // For demonstration purposes, we'll just add a marker that it's been processed
-        std::vector<uint8_t> peData = loadResource(targetPath);
-        if (peData.empty()) {
-            std::cerr << "Failed to read PE file: " << targetPath << std::endl;
+        // Use the PE parser to properly obfuscate imports
+        PEParser parser;
+        if (!parser.loadPE(targetPath)) {
+            std::cerr << "Failed to load PE file: " << targetPath << std::endl;
             return false;
         }
         
-        // Add a marker comment at the end of the file
-        std::string marker = "IMPORTS_OBFUSCATED";
-        std::vector<uint8_t> markerData(marker.begin(), marker.end());
+        // Get and display current imports before obfuscation
+        auto imports = parser.getImports();
+        std::cout << "Found " << imports.size() << " import descriptors" << std::endl;
         
-        peData.insert(peData.end(), markerData.begin(), markerData.end());
+        for (const auto& imp : imports) {
+            std::cout << "  DLL: " << imp.dllName << " (" << imp.functions.size() << " functions)" << std::endl;
+        }
         
-        // Write the modified PE file
-        std::ofstream outFile(targetPath, std::ios::binary);
-        if (!outFile) {
-            std::cerr << "Failed to create output file: " << targetPath << std::endl;
+        // Perform obfuscation
+        if (!parser.obfuscateImports()) {
+            std::cerr << "Failed to obfuscate imports" << std::endl;
             return false;
         }
         
-        outFile.write(reinterpret_cast<const char*>(peData.data()), peData.size());
-        outFile.close();
+        // Save the modified PE file
+        if (!parser.save(targetPath)) {
+            std::cerr << "Failed to save modified PE file" << std::endl;
+            return false;
+        }
         
+        std::cout << "Import table obfuscation completed successfully" << std::endl;
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Error in task317: " << e.what() << std::endl;
@@ -563,32 +596,40 @@ bool Z3Processor::task317(const std::string& targetPath) {
 bool Z3Processor::task318(const std::string& targetPath) {
     // Obfuscate PE export table
     try {
-        // This is a placeholder for PE export table obfuscation
-        // In a real implementation, this would parse and modify the PE export table
-        
-        // For demonstration purposes, we'll just add a marker that it's been processed
-        std::vector<uint8_t> peData = loadResource(targetPath);
-        if (peData.empty()) {
-            std::cerr << "Failed to read PE file: " << targetPath << std::endl;
+        // Use the PE parser to properly obfuscate exports
+        PEParser parser;
+        if (!parser.loadPE(targetPath)) {
+            std::cerr << "Failed to load PE file: " << targetPath << std::endl;
             return false;
         }
         
-        // Add a marker comment at the end of the file
-        std::string marker = "EXPORTS_OBFUSCATED";
-        std::vector<uint8_t> markerData(marker.begin(), marker.end());
+        // Get and display current exports before obfuscation
+        auto exports = parser.getExports();
+        std::cout << "Found " << exports.size() << " export descriptors" << std::endl;
         
-        peData.insert(peData.end(), markerData.begin(), markerData.end());
+        for (const auto& exp : exports) {
+            std::cout << "  DLL: " << exp.dllName << " (" << exp.functions.size() << " functions)" << std::endl;
+            for (size_t i = 0; i < std::min(size_t(5), exp.functions.size()); i++) {
+                std::cout << "    - " << exp.functions[i] << std::endl;
+            }
+            if (exp.functions.size() > 5) {
+                std::cout << "    ... and " << (exp.functions.size() - 5) << " more" << std::endl;
+            }
+        }
         
-        // Write the modified PE file
-        std::ofstream outFile(targetPath, std::ios::binary);
-        if (!outFile) {
-            std::cerr << "Failed to create output file: " << targetPath << std::endl;
+        // Perform obfuscation
+        if (!parser.obfuscateExports()) {
+            std::cerr << "Failed to obfuscate exports" << std::endl;
             return false;
         }
         
-        outFile.write(reinterpret_cast<const char*>(peData.data()), peData.size());
-        outFile.close();
+        // Save the modified PE file
+        if (!parser.save(targetPath)) {
+            std::cerr << "Failed to save modified PE file" << std::endl;
+            return false;
+        }
         
+        std::cout << "Export table obfuscation completed successfully" << std::endl;
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Error in task318: " << e.what() << std::endl;
@@ -668,11 +709,34 @@ std::vector<uint8_t> Z3Processor::algorithmXor(const std::vector<uint8_t>& data)
 }
 
 std::vector<uint8_t> Z3Processor::algorithmAesCbc(const std::vector<uint8_t>& data, bool encrypt) {
-    // Placeholder for AES-CBC implementation
-    // In a real implementation, this would use a proper AES library
-    
-    // For now, just return XOR-encrypted data as a placeholder
-    return algorithmXor(data);
+    // Use proper AES-CBC implementation
+    try {
+        // Generate key from seed (use first 32 bytes for AES-256)
+        std::vector<uint8_t> key(32);
+        for (size_t i = 0; i < 32; i++) {
+            key[i] = m_seedValue[i % m_seedValue.size()];
+        }
+        
+        // Generate IV from seed (use next 16 bytes)
+        std::vector<uint8_t> iv(16);
+        for (size_t i = 0; i < 16; i++) {
+            iv[i] = m_seedValue[(i + 32) % m_seedValue.size()];
+        }
+        
+        // Create AES-CBC instance
+        AES_CBC aes(key, iv);
+        
+        // Encrypt or decrypt
+        if (encrypt) {
+            return aes.encrypt(data);
+        } else {
+            return aes.decrypt(data);
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "AES-CBC error: " << e.what() << std::endl;
+        // Fall back to XOR on error
+        return algorithmXor(data);
+    }
 }
 
 std::vector<uint8_t> Z3Processor::algorithmAesCtr(const std::vector<uint8_t>& data, bool encrypt) {

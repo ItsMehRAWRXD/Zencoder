@@ -10,7 +10,7 @@ std::mutex g_protectedRegionsMutex;
 std::map<DWORD, std::set<std::pair<uintptr_t, uintptr_t>>> g_protectedRegions;
 
 // Register a memory region to be protected
-void registerProtectedMemoryRegion(DWORD processId, void* startAddress, SIZE_T size) {
+void registerProtectedMemoryRegion(DWORD processId, void* startAddress, size_t size) {
     std::lock_guard<std::mutex> lock(g_protectedRegionsMutex);
     g_protectedRegions[processId].insert(std::make_pair(
         reinterpret_cast<uintptr_t>(startAddress),

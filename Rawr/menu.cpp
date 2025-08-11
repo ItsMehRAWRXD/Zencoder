@@ -5,8 +5,12 @@
 #include <iomanip>
 #include <map>
 
+#ifndef _WIN32
+#include "utils/windows_stubs.h"
+#endif
+
 // Forward declaration of KernelHookManager - will be defined in main.cpp
-extern void registerProtectedMemoryRegion(DWORD processId, void* startAddress, SIZE_T size);
+extern void registerProtectedMemoryRegion(DWORD processId, void* startAddress, size_t size);
 
 // Map of encryption modes
 static const std::map<char, Fx7z9Process> encryptionModes = {

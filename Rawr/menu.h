@@ -3,7 +3,14 @@
 
 #include <string>
 #include <vector>
+
+#ifdef _WIN32
 #include <windows.h>
+#else
+#include <cstdint>
+typedef uint32_t DWORD;
+typedef void* HANDLE;
+#endif
 
 // Forward declarations
 class Z3Processor;
@@ -14,6 +21,9 @@ public:
     bool isKernelHookAvailable() { return false; }
     bool initialize() { return false; }
     void cleanup() {}
+    bool installHook(void* targetAddress, void* hookFunction, void** originalFunction) { return false; }
+    void registerProtectedMemory(void* address, size_t size) {}
+    bool installStandardHooks() { return false; }
 };
 
 // Menu display and handling functions
