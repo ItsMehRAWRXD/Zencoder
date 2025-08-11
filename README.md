@@ -1,373 +1,267 @@
-#include <iostream>
-#include "menu.h"
+# Zencoder - Advanced Encryption and File Packing Tool
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the Encryption and Packing Tool!" << std::endl;
+A comprehensive C++ utility for file encryption, decryption, and packing with support for multiple cryptographic algorithms.
 
-    // Display the menu and handle user input
-    while (true) {
-        int choice = displayMenu();
-        if (choice == 0) {
-            break; // Exit the application
-        }
-        handleUserChoice(choice);
-    }
+## Features
 
-    return 0;
-}
+### 🔐 Encryption Algorithms
+- **AES-CBC** - Advanced Encryption Standard in Cipher Block Chaining mode
+- **AES-CTR** - AES in Counter mode for parallel processing
+- **ChaCha20** - High-performance stream cipher
+- **Blowfish** - Fast block cipher
+- **Twofish** - AES finalist with 128-bit block size
+- **Serpent** - AES finalist with high security margin
+- **Camellia** - Japanese block cipher
+- **GCM** - Galois/Counter Mode for authenticated encryption
+- **Poly1305** - High-speed message authentication code
+- **RC4** - Stream cipher (legacy support)
+
+### 📦 File Operations
+- **Single File Encryption/Decryption**
+- **Batch Folder Processing**
+- **File Packing** - Combine multiple files into encrypted archives
+- **PE File Manipulation** - Windows executable file handling
+- **Memory Protection** - Kernel-level memory region protection
+
+### 🛡️ Security Features
+- **Cryptographically Secure Random Number Generation**
+- **Memory Protection Hooks** (Windows)
+- **Secure Key Material Handling**
+- **Multiple Encryption Modes**
+
+## Prerequisites
+
+### Required Dependencies
+- **CMake** (version 3.16 or higher)
+- **C++17** compatible compiler
+- **OpenSSL** development libraries
+
+### Installing Dependencies
+
+#### Ubuntu/Debian
+```bash
+sudo apt update
+sudo apt install build-essential cmake libssl-dev
 ```
 
-**src/menu.cpp**
-```cpp
-#include <iostream>
-#include "menu.h"
-
-int displayMenu() {
-    std::cout << "Select an option:" << std::endl;
-    std::cout << "1. AES-CBC Encryption" << std::endl;
-    std::cout << "2. AES-CTR Encryption" << std::endl;
-    std::cout << "3. Blowfish Encryption" << std::endl;
-    std::cout << "4. Camellia Encryption" << std::endl;
-    std::cout << "5. ChaCha20 Encryption" << std::endl;
-    std::cout << "6. GCM Encryption" << std::endl;
-    std::cout << "7. Poly1305 Authentication" << std::endl;
-    std::cout << "8. RC4 Encryption" << std::endl;
-    std::cout << "9. Serpent Encryption" << std::endl;
-    std::cout << "10. Twofish Encryption" << std::endl;
-    std::cout << "11. Repack Files" << std::endl;
-    std::cout << "0. Exit" << std::endl;
-
-    int choice;
-    std::cin >> choice;
-    return choice;
-}
-
-void handleUserChoice(int choice) {
-    switch (choice) {
-        case 1:
-            // Call AES-CBC encryption function
-            break;
-        case 2:
-            // Call AES-CTR encryption function
-            break;
-        case 3:
-            // Call Blowfish encryption function
-            break;
-        case 4:
-            // Call Camellia encryption function
-            break;
-        case 5:
-            // Call ChaCha20 encryption function
-            break;
-        case 6:
-            // Call GCM encryption function
-            break;
-        case 7:
-            // Call Poly1305 authentication function
-            break;
-        case 8:
-            // Call RC4 encryption function
-            break;
-        case 9:
-            // Call Serpent encryption function
-            break;
-        case 10:
-            // Call Twofish encryption function
-            break;
-        case 11:
-            // Call repack files function
-            break;
-        default:
-            std::cout << "Invalid choice. Please try again." << std::endl;
-            break;
-    }
-}
+#### CentOS/RHEL/Fedora
+```bash
+sudo yum install gcc-c++ cmake openssl-devel
+# or for newer versions:
+sudo dnf install gcc-c++ cmake openssl-devel
 ```
 
-**src/menu.h**
-```cpp
-#ifndef MENU_H
-#define MENU_H
-
-int displayMenu();
-void handleUserChoice(int choice);
-
-#endif // MENU_H
+#### macOS
+```bash
+brew install cmake openssl
 ```
 
-**src/encryption/aes_cbc.cpp**
-```cpp
-#include "aes_cbc.h"
-
-// Implementation of AES-CBC encryption algorithm
-```
-
-**src/encryption/aes_cbc.h**
-```cpp
-#ifndef AES_CBC_H
-#define AES_CBC_H
-
-// Declarations for AES-CBC encryption functions
-
-#endif // AES_CBC_H
-```
-
-**src/encryption/aes_ctr.cpp**
-```cpp
-#include "aes_ctr.h"
-
-// Implementation of AES-CTR encryption algorithm
-```
-
-**src/encryption/aes_ctr.h**
-```cpp
-#ifndef AES_CTR_H
-#define AES_CTR_H
-
-// Declarations for AES-CTR encryption functions
-
-#endif // AES_CTR_H
-```
-
-**src/encryption/blowfish.cpp**
-```cpp
-#include "blowfish.h"
-
-// Implementation of Blowfish encryption algorithm
-```
-
-**src/encryption/blowfish.h**
-```cpp
-#ifndef BLOWFISH_H
-#define BLOWFISH_H
-
-// Declarations for Blowfish encryption functions
-
-#endif // BLOWFISH_H
-```
-
-**src/encryption/camellia.cpp**
-```cpp
-#include "camellia.h"
-
-// Implementation of Camellia encryption algorithm
-```
-
-**src/encryption/camellia.h**
-```cpp
-#ifndef CAMELLIA_H
-#define CAMELLIA_H
-
-// Declarations for Camellia encryption functions
-
-#endif // CAMELLIA_H
-```
-
-**src/encryption/chacha20.cpp**
-```cpp
-#include "chacha20.h"
-
-// Implementation of ChaCha20 encryption algorithm
-```
-
-**src/encryption/chacha20.h**
-```cpp
-#ifndef CHACHA20_H
-#define CHACHA20_H
-
-// Declarations for ChaCha20 encryption functions
-
-#endif // CHACHA20_H
-```
-
-**src/encryption/encryption_base.cpp**
-```cpp
-#include "encryption_base.h"
-
-// Implementation of base class for encryption algorithms
-```
-
-**src/encryption/encryption_base.h**
-```cpp
-#ifndef ENCRYPTION_BASE_H
-#define ENCRYPTION_BASE_H
-
-// Declarations for base class for encryption algorithms
-
-#endif // ENCRYPTION_BASE_H
-```
-
-**src/encryption/gcm.cpp**
-```cpp
-#include "gcm.h"
-
-// Implementation of GCM encryption algorithm
-```
-
-**src/encryption/gcm.h**
-```cpp
-#ifndef GCM_H
-#define GCM_H
-
-// Declarations for GCM encryption functions
-
-#endif // GCM_H
-```
-
-**src/encryption/poly1305.cpp**
-```cpp
-#include "poly1305.h"
-
-// Implementation of Poly1305 authentication algorithm
-```
-
-**src/encryption/poly1305.h**
-```cpp
-#ifndef POLY1305_H
-#define POLY1305_H
-
-// Declarations for Poly1305 authentication functions
-
-#endif // POLY1305_H
-```
-
-**src/encryption/rc4.cpp**
-```cpp
-#include "rc4.h"
-
-// Implementation of RC4 encryption algorithm
-```
-
-**src/encryption/rc4.h**
-```cpp
-#ifndef RC4_H
-#define RC4_H
-
-// Declarations for RC4 encryption functions
-
-#endif // RC4_H
-```
-
-**src/encryption/serpent.cpp**
-```cpp
-#include "serpent.h"
-
-// Implementation of Serpent encryption algorithm
-```
-
-**src/encryption/serpent.h**
-```cpp
-#ifndef SERPENT_H
-#define SERPENT_H
-
-// Declarations for Serpent encryption functions
-
-#endif // SERPENT_H
-```
-
-**src/encryption/twofish.cpp**
-```cpp
-#include "twofish.h"
-
-// Implementation of Twofish encryption algorithm
-```
-
-**src/encryption/twofish.h**
-```cpp
-#ifndef TWOFISH_H
-#define TWOFISH_H
-
-// Declarations for Twofish encryption functions
-
-#endif // TWOFISH_H
-```
-
-**src/utils/file_utils.cpp**
-```cpp
-#include "file_utils.h"
-
-// Implementation of utility functions for file operations
-```
-
-**src/utils/file_utils.h**
-```cpp
-#ifndef FILE_UTILS_H
-#define FILE_UTILS_H
-
-// Declarations for utility functions for file operations
-
-#endif // FILE_UTILS_H
-```
-
-**src/utils/logging.cpp**
-```cpp
-#include "logging.h"
-
-// Implementation of logging functionality
-```
-
-**src/utils/logging.h**
-```cpp
-#ifndef LOGGING_H
-#define LOGGING_H
-
-// Declarations for logging functions
-
-#endif // LOGGING_H
-```
-
-**src/types/enums.h**
-```cpp
-#ifndef ENUMS_H
-#define ENUMS_H
-
-// Enumeration definitions for encryption types
-
-#endif // ENUMS_H
-```
-
-**CMakeLists.txt**
-```cmake
-cmake_minimum_required(VERSION 3.10)
-project(EncryptionPacker)
-
-set(CMAKE_CXX_STANDARD 17)
-
-include_directories(src)
-
-file(GLOB SOURCES "src/*.cpp" "src/encryption/*.cpp" "src/utils/*.cpp" "src/types/*.cpp")
-
-add_executable(EncryptionPacker ${SOURCES})
-```
-
-**.gitignore**
-```
-build/
-*.o
-*.exe
-*.out
-*.old
-```
-
-**README.md**
-```
-# Encryption and Packing Tool
-
-## Description
-This project provides a tool for encrypting files using various algorithms and repacking them.
+#### Windows
+- Install Visual Studio 2022 with C++ support (see [WINDOWS_SETUP.md](WINDOWS_SETUP.md) for detailed instructions)
+- Install CMake from https://cmake.org/ (or use the one included with Visual Studio)
+- Install OpenSSL from https://slproweb.com/products/Win32OpenSSL.html
 
 ## Building the Project
-To build the project, use the following commands:
+
+### Clone the Repository
+```bash
+git clone https://github.com/yourusername/zencoder.git
+cd zencoder
 ```
+
+### Build Instructions
+
+#### Windows (Visual Studio 2022)
+```cmd
+# Use the Windows build script (recommended)
+build.bat
+
+# Or use CMake directly
 mkdir build
 cd build
+cmake .. -G "Visual Studio 17 2022" -A x64
+cmake --build . --config Release
+```
+
+#### Linux/macOS
+```bash
+# Create build directory
+mkdir build
+cd build
+
+# Configure with CMake
 cmake ..
-make
+
+# Build the project
+make -j$(nproc)
+```
+
+### Install (Optional)
+```bash
+# Install to system
+sudo make install
+
+# Or install to custom directory
+make install DESTDIR=/path/to/install
 ```
 
 ## Usage
-Run the executable and follow the on-screen instructions to select encryption methods and repack files.
+
+### Running the Application
+
+#### Windows
+```cmd
+# From build directory
+build\bin\Release\zencoder.exe
+
+# Or if installed system-wide
+zencoder.exe
 ```
 
-This structure provides a complete framework for your project, allowing for the selection of various encryption methods and repacking functionality.
+#### Linux/macOS
+```bash
+# From build directory
+./bin/zencoder
+
+# Or if installed system-wide
+zencoder
+```
+
+### Command Line Interface
+
+The application provides an interactive menu system:
+
+1. **Encryption/Decryption Operations**
+   - Encrypt single files
+   - Decrypt files
+   - Batch folder encryption/decryption
+
+2. **File Packing Operations**
+   - Create encrypted archives
+   - Extract from archives
+   - List archive contents
+
+3. **PE File Manipulation**
+   - Analyze Windows executables
+   - Modify PE headers
+   - Add custom sections
+
+4. **Security and Protection Options**
+   - Memory region protection
+   - Kernel hook management
+   - Security monitoring
+
+### Example Workflow
+
+1. **Encrypt a File**
+   ```
+   Select: 1 (Encryption/Decryption)
+   Select: 1 (Encrypt a file)
+   Choose algorithm: AES-CBC
+   Enter input file: /path/to/file.txt
+   Enter output file: /path/to/file.enc
+   ```
+
+2. **Create Encrypted Archive**
+   ```
+   Select: 2 (File Packing)
+   Select: 1 (Create archive)
+   Choose algorithm: ChaCha20
+   Enter files: file1.txt, file2.txt, file3.txt
+   Enter output: archive.z3
+   ```
+
+## Project Structure
+
+```
+zencoder/
+├── CMakeLists.txt          # Build configuration
+├── README.md              # This file
+├── include/               # Public headers
+│   └── packer.h          # Main API header
+├── src/                   # Source code
+│   ├── main.cpp          # Application entry point
+│   ├── menu.cpp          # User interface
+│   ├── menu.h            # Menu declarations
+│   ├── packer.cpp        # Core packing logic
+│   ├── packer.h          # Packer declarations
+│   ├── encryption/       # Encryption algorithms
+│   │   ├── aes_cbc.cpp
+│   │   ├── aes_ctr.cpp
+│   │   ├── chacha20.cpp
+│   │   └── ...
+│   └── utils/            # Utility functions
+│       ├── file_utils.cpp
+│       └── logging.cpp
+├── types/                # Type definitions
+│   └── enums.h          # Enumeration types
+├── test/                 # Test files
+└── driver/              # Driver components
+```
+
+## Security Considerations
+
+### ⚠️ Important Notes
+- This tool is for educational and legitimate security research purposes
+- Always backup your files before encryption
+- Store encryption keys securely
+- The tool includes memory protection features but should not be considered a complete security solution
+
+### 🔒 Security Features
+- **Secure Random Generation**: Uses hardware entropy sources
+- **Memory Protection**: Kernel-level memory region protection (Windows)
+- **Key Material Handling**: Secure wiping of sensitive data
+- **Algorithm Validation**: Proper implementation of cryptographic standards
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+- Follow C++17 standards
+- Use meaningful variable names
+- Add proper error handling
+- Include unit tests for new features
+- Document all public APIs
+
+## Testing
+
+### Running Tests
+```bash
+cd build
+make test
+```
+
+### Manual Testing
+```bash
+# Test file encryption
+echo "Hello, World!" > test.txt
+./bin/zencoder
+# Use menu to encrypt test.txt
+# Verify decryption works correctly
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- OpenSSL project for cryptographic primitives
+- Contributors and security researchers
+- Open source community
+
+## Support
+
+For issues and questions:
+- Create an issue on GitHub
+- Check the documentation
+- Review the source code
+
+---
+
+**Disclaimer**: This tool is provided as-is for educational purposes. Users are responsible for ensuring compliance with local laws and regulations regarding cryptography and data protection.

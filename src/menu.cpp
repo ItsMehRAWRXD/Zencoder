@@ -1,53 +1,22 @@
 #include "menu.h"
-#include "packer.h"
+#include "../src/encryption/aes_cbc.h"
+#include "../src/utils/file_utils.h"
+#include "../src/stub_generator.h"
+#include "../src/drag_drop.h"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include <map>
-
-// Forward declaration of KernelHookManager - will be defined in main.cpp
-extern void registerProtectedMemoryRegion(DWORD processId, void* startAddress, SIZE_T size);
-
-// Map of encryption modes
-static const std::map<char, Fx7z9Process> encryptionModes = {
-    {'x', Fx7z9Process::Qx3r},  // Basic XOR
-    {'k', Fx7z9Process::K5bc},  // AES-CBC
-    {'m', Fx7z9Process::M2tr},  // AES-CTR
-    {'z', Fx7z9Process::Z1ha},  // ChaCha20
-    {'p', Fx7z9Process::P3rc},  // RC4
-    {'b', Fx7z9Process::B2fs},  // Blowfish
-    {'t', Fx7z9Process::T5sh},  // Twofish
-    {'s', Fx7z9Process::S7pt},  // Serpent
-    {'c', Fx7z9Process::C9la},  // Camellia
-    {'g', Fx7z9Process::G4cm},  // GCM
-    {'y', Fx7z9Process::P1y5}   // Poly1305
-};
+#include <limits>
 
 void displayMenu() {
-    Z3Processor processor;
-    KernelHookManager hookManager;
-    
     bool exitProgram = false;
     
-    // Try to initialize hook manager once at startup
-    bool hooksAvailable = hookManager.isKernelHookAvailable();
-    if (hooksAvailable) {
-        if (hookManager.initialize()) {
-            std::cout << "Security hooks initialized successfully." << std::endl;
-        } else {
-            std::cout << "Failed to initialize security hooks." << std::endl;
-            hooksAvailable = false;
-        }
-    }
-    
     while (!exitProgram) {
-        std::cout << "\n==== Encryption and Packing Tool ====\n";
+        std::cout << "\n==== Zencoder Crypto Utility ====\n";
         std::cout << "1. Encryption/Decryption Operations\n";
-        std::cout << "2. File Packing Operations\n";
-        std::cout << "3. PE File Manipulation\n";
-        if (hooksAvailable) {
-            std::cout << "4. Security and Protection Options\n";
-        }
+        std::cout << "2. File Operations\n";
+        std::cout << "3. Stub Generator\n";
+        std::cout << "4. Drag and Drop Interface\n";
         std::cout << "0. Exit\n";
         std::cout << "Enter your choice: ";
         
@@ -60,562 +29,456 @@ void displayMenu() {
             displayEncryptionMenu();
             int encChoice;
             std::cin >> encChoice;
-            handleEncryptionChoice(encChoice, processor);
+            handleEncryptionChoice(encChoice);
         } else if (choice == 2) {
-            displayPackingMenu();
-            int packChoice;
-            std::cin >> packChoice;
-            handlePackingChoice(packChoice, processor);
+            displayFileMenu();
+            int fileChoice;
+            std::cin >> fileChoice;
+            handleFileChoice(fileChoice);
         } else if (choice == 3) {
-            displayPEMenu();
-            int peChoice;
-            std::cin >> peChoice;
-            handlePEManipulationChoice(peChoice, processor, hookManager);
-        } else if (choice == 4 && hooksAvailable) {
-            displaySecurityMenu();
-            int secChoice;
-            std::cin >> secChoice;
-            handleSecurityChoice(secChoice, hookManager);
+            displayStubMenu();
+            int stubChoice;
+            std::cin >> stubChoice;
+            handleStubChoice(stubChoice);
+        } else if (choice == 4) {
+            displayDragDropMenu();
+            int dragChoice;
+            std::cin >> dragChoice;
+            handleDragDropChoice(dragChoice);
         } else {
             std::cout << "Invalid choice. Please try again.\n";
         }
     }
     
-    // Clean up hooks before exiting
-    if (hooksAvailable) {
-        hookManager.cleanup();
-    }
-    
-    std::cout << "Thank you for using the Encryption and Packing Tool!\n";
+    std::cout << "Thank you for using Zencoder!\n";
 }
 
 void displayEncryptionMenu() {
     std::cout << "\n==== Encryption/Decryption Operations ====\n";
-    std::cout << "1. Encrypt a file\n";
-    std::cout << "2. Decrypt a file\n";
-    std::cout << "3. Encrypt a folder\n";
-    std::cout << "4. Decrypt a folder\n";
+    std::cout << "1. Encrypt a file (AES-CBC)\n";
+    std::cout << "2. Decrypt a file (AES-CBC)\n";
     std::cout << "0. Back to Main Menu\n";
     std::cout << "Enter your choice: ";
 }
 
-void handleEncryptionChoice(int choice, Z3Processor& processor) {
-    if (choice == 0) {
-        return;
-    }
-    
-    bool isEncrypt = (choice == 1 || choice == 3);
-    bool isFolder = (choice == 3 || choice == 4);
-    
-    // Select encryption algorithm
-    std::cout << "\nSelect encryption algorithm:\n";
-    std::cout << "x - XOR (Basic)\n";
-    std::cout << "k - AES-CBC\n";
-    std::cout << "m - AES-CTR\n";
-    std::cout << "z - ChaCha20\n";
-    std::cout << "p - RC4\n";
-    std::cout << "b - Blowfish\n";
-    std::cout << "t - Twofish\n";
-    std::cout << "s - Serpent\n";
-    std::cout << "c - Camellia\n";
-    std::cout << "g - GCM (Authenticated)\n";
-    std::cout << "y - Poly1305 (Authenticated)\n";
-    std::cout << "Enter your choice: ";
-    
-    char algoChoice;
-    std::cin >> algoChoice;
-    
-    auto modeIt = encryptionModes.find(std::tolower(algoChoice));
-    if (modeIt == encryptionModes.end()) {
-        std::cout << "Invalid algorithm choice. Using XOR as default.\n";
-        processor.setupMode(Fx7z9Process::Qx3r);
-    } else {
-        processor.setupMode(modeIt->second);
-    }
-    
-    // Get seed/key
-    std::vector<uint8_t> seed = getHexSeed();
-    processor.setupSeed(seed);
-    
-    if (isFolder) {
-        // Handle folder encryption/decryption
-        std::string folderPath = getInputPath(isEncrypt ? "Enter folder to encrypt: " : "Enter folder to decrypt: ");
-        std::string outputPath = getInputPath("Enter output folder: ");
+void handleEncryptionChoice(int choice) {
+    switch (choice) {
+        case 1: {
+            std::cout << "Enter input file path: ";
+            std::string inputFile = getInputPath("Input file");
+            if (inputFile.empty()) return;
+            
+            std::cout << "Enter output file path: ";
+            std::string outputFile = getInputPath("Output file");
+            if (outputFile.empty()) return;
+            
+            // Read the input file
+            auto fileData = FileUtils::readFile(inputFile);
+            if (fileData.empty()) {
+                std::cout << "Error: Could not read input file.\n";
+                return;
+            }
+            
+            // Initialize AES encryption
+            AESCBC aes;
+            auto key = AESCBC::generateKey(32);  // 256-bit key
+            auto iv = AESCBC::generateIV();
+            
+            if (!aes.initialize(key, iv)) {
+                std::cout << "Error: Failed to initialize AES encryption.\n";
+                return;
+            }
+            
+            // Encrypt the data
+            auto encryptedData = aes.encrypt(fileData);
+            if (encryptedData.empty()) {
+                std::cout << "Error: Encryption failed.\n";
+                return;
+            }
+            
+            // Save encrypted data
+            if (!FileUtils::writeFile(outputFile, encryptedData)) {
+                std::cout << "Error: Failed to save encrypted file.\n";
+                return;
+            }
+            
+            std::cout << "File encrypted successfully: " << outputFile << "\n";
+            break;
+        }
         
-        // This functionality would need to be implemented in Z3Processor
-        // For now, just show a placeholder message
-        std::cout << "Folder " << (isEncrypt ? "encryption" : "decryption") << " not yet implemented.\n";
-    } else {
-        // Handle single file encryption/decryption
-        if (isEncrypt) {
-            std::string inputFile = getInputPath("Enter file to encrypt: ");
-            std::string outputFile = getInputPath("Enter output file: ");
+        case 2: {
+            std::cout << "Enter encrypted file path: ";
+            std::string inputFile = getInputPath("Encrypted file");
+            if (inputFile.empty()) return;
             
-            std::vector<std::string> inputFiles = {inputFile};
-            processor.runTask42(inputFiles, outputFile);
+            std::cout << "Enter output file path: ";
+            std::string outputFile = getInputPath("Output file");
+            if (outputFile.empty()) return;
             
-            std::cout << "File encrypted successfully.\n";
-        } else {
-            std::string inputFile = getInputPath("Enter file to decrypt: ");
-            std::string outputDir = getInputPath("Enter output directory: ");
+            // Read the encrypted file
+            auto encryptedData = FileUtils::readFile(inputFile);
+            if (encryptedData.empty()) {
+                std::cout << "Error: Could not read encrypted file.\n";
+                return;
+            }
             
-            processor.runTask67(inputFile, outputDir);
+            // Initialize AES decryption
+            AESCBC aes;
+            auto key = AESCBC::generateKey(32);  // 256-bit key
+            auto iv = AESCBC::generateIV();
             
-            std::cout << "File decrypted successfully.\n";
+            if (!aes.initialize(key, iv)) {
+                std::cout << "Error: Failed to initialize AES decryption.\n";
+                return;
+            }
+            
+            // Decrypt the data
+            auto decryptedData = aes.decrypt(encryptedData);
+            if (decryptedData.empty()) {
+                std::cout << "Error: Decryption failed.\n";
+                return;
+            }
+            
+            // Save decrypted data
+            if (!FileUtils::writeFile(outputFile, decryptedData)) {
+                std::cout << "Error: Failed to save decrypted file.\n";
+                return;
+            }
+            
+            std::cout << "File decrypted successfully: " << outputFile << "\n";
+            break;
         }
+        
+        case 0:
+            return;
+            
+        default:
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
     }
 }
 
-void displayPackingMenu() {
-    std::cout << "\n==== File Packing Operations ====\n";
-    std::cout << "1. Pack multiple files\n";
-    std::cout << "2. Unpack files\n";
-    std::cout << "3. Check package format\n";
+void displayFileMenu() {
+    std::cout << "\n==== File Operations ====\n";
+    std::cout << "1. Get file information\n";
+    std::cout << "2. Create backup of file\n";
+    std::cout << "3. Securely delete file\n";
     std::cout << "0. Back to Main Menu\n";
     std::cout << "Enter your choice: ";
 }
 
-void handlePackingChoice(int choice, Z3Processor& processor) {
+void handleFileChoice(int choice) {
     switch (choice) {
-        case 0:
-            return;
-            
         case 1: {
-            // Pack multiple files
-            std::vector<std::string> files = getMultipleInputPaths();
-            if (files.empty()) {
-                std::cout << "No files selected for packing.\n";
+            std::string filePath = getInputPath("File path");
+            if (filePath.empty()) return;
+            
+            if (!FileUtils::fileExists(filePath)) {
+                std::cout << "Error: File does not exist.\n";
                 return;
             }
             
-            std::string outputFile = getInputPath("Enter output package file: ");
+            std::cout << "File Information:\n";
+            std::cout << "  Path: " << filePath << "\n";
+            std::cout << "  Size: " << FileUtils::getFileSize(filePath) << " bytes\n";
+            std::cout << "  Type: " << (FileUtils::isTextFile(filePath) ? "Text" : "Binary") << "\n";
+            std::cout << "  Extension: " << FileUtils::getFileExtension(filePath) << "\n";
+            break;
+        }
+        
+        case 2: {
+            std::string filePath = getInputPath("File path");
+            if (filePath.empty()) return;
             
-            // Ask if encryption should be applied
-            std::cout << "Apply encryption to the package? (y/n): ";
-            char encChoice;
-            std::cin >> encChoice;
+            if (!FileUtils::fileExists(filePath)) {
+                std::cout << "Error: File does not exist.\n";
+                return;
+            }
             
-            if (std::tolower(encChoice) == 'y') {
-                // Select encryption algorithm
-                std::cout << "\nSelect encryption algorithm:\n";
-                std::cout << "x - XOR (Basic)\n";
-                std::cout << "k - AES-CBC\n";
-                std::cout << "m - AES-CTR\n";
-                std::cout << "z - ChaCha20\n";
-                std::cout << "p - RC4\n";
-                std::cout << "b - Blowfish\n";
-                std::cout << "t - Twofish\n";
-                std::cout << "s - Serpent\n";
-                std::cout << "c - Camellia\n";
-                std::cout << "g - GCM (Authenticated)\n";
-                std::cout << "y - Poly1305 (Authenticated)\n";
-                std::cout << "Enter your choice: ";
-                
-                char algoChoice;
-                std::cin >> algoChoice;
-                
-                auto modeIt = encryptionModes.find(std::tolower(algoChoice));
-                if (modeIt == encryptionModes.end()) {
-                    std::cout << "Invalid algorithm choice. Using XOR as default.\n";
-                    processor.setupMode(Fx7z9Process::Qx3r);
+            std::string backupPath = FileUtils::createBackup(filePath);
+            if (!backupPath.empty()) {
+                std::cout << "Backup created: " << backupPath << "\n";
+            } else {
+                std::cout << "Error: Failed to create backup.\n";
+            }
+            break;
+        }
+        
+        case 3: {
+            std::string filePath = getInputPath("File path to delete");
+            if (filePath.empty()) return;
+            
+            if (!FileUtils::fileExists(filePath)) {
+                std::cout << "Error: File does not exist.\n";
+                return;
+            }
+            
+            std::cout << "Warning: This will permanently delete the file!\n";
+            std::cout << "Are you sure? (y/N): ";
+            char confirm;
+            std::cin >> confirm;
+            
+            if (confirm == 'y' || confirm == 'Y') {
+                if (FileUtils::secureDelete(filePath, 3)) {
+                    std::cout << "File securely deleted.\n";
                 } else {
-                    processor.setupMode(modeIt->second);
+                    std::cout << "Error: Failed to delete file.\n";
                 }
-                
-                // Get seed/key
-                std::vector<uint8_t> seed = getHexSeed();
-                processor.setupSeed(seed);
             } else {
-                // No encryption
-                processor.setupMode(Fx7z9Process::D4t0);
-            }
-            
-            processor.runTask42(files, outputFile);
-            std::cout << "Files packed successfully into " << outputFile << std::endl;
-            break;
-        }
-            
-        case 2: {
-            // Unpack files
-            std::string packageFile = getInputPath("Enter package file to unpack: ");
-            std::string outputDir = getInputPath("Enter output directory: ");
-            
-            // Ask for decryption key if needed
-            std::cout << "Is the package encrypted? (y/n): ";
-            char encChoice;
-            std::cin >> encChoice;
-            
-            if (std::tolower(encChoice) == 'y') {
-                // Get seed/key
-                std::vector<uint8_t> seed = getHexSeed();
-                processor.setupSeed(seed);
-            }
-            
-            processor.runTask67(packageFile, outputDir);
-            std::cout << "Package unpacked successfully to " << outputDir << std::endl;
-            break;
-        }
-            
-        case 3: {
-            // Check package format
-            std::string packageFile = getInputPath("Enter package file to check: ");
-            
-            if (processor.checkFormat92(packageFile)) {
-                std::cout << "File has a valid package format.\n";
-            } else {
-                std::cout << "File does NOT have a valid package format.\n";
+                std::cout << "Deletion cancelled.\n";
             }
             break;
         }
-            
-        default:
-            std::cout << "Invalid choice.\n";
-    }
-}
-
-void displayPEMenu() {
-    std::cout << "\n==== PE File Manipulation ====\n";
-    std::cout << "1. Add component to PE file\n";
-    std::cout << "2. Process component in PE file\n";
-    std::cout << "3. Obfuscate import table\n";
-    std::cout << "4. Obfuscate export table\n";
-    std::cout << "5. Apply complete obfuscation\n";
-    std::cout << "0. Back to Main Menu\n";
-    std::cout << "Enter your choice: ";
-}
-
-void handlePEManipulationChoice(int choice, Z3Processor& processor, KernelHookManager& hookManager) {
-    switch (choice) {
+        
         case 0:
             return;
             
-        case 1: {
-            // Add component to PE file
-            std::string peFile = getInputPath("Enter PE file path: ");
-            
-            if (!processor.checkFormat92(peFile)) {
-                std::cout << "File does not have a valid PE format.\n";
-                return;
-            }
-            
-            std::cout << "Enter component label (max 8 chars): ";
-            std::string label;
-            std::cin >> label;
-            
-            std::string componentFile = getInputPath("Enter component data file: ");
-            auto componentData = processor.loadResource(componentFile);
-            
-            if (componentData.empty()) {
-                std::cout << "Failed to load component data.\n";
-                return;
-            }
-            
-            // Register component data memory as protected if hooks are available
-            try {
-                registerProtectedMemoryRegion(GetCurrentProcessId(), componentData.data(), componentData.size());
-            } catch (...) {
-                // Continue if protection fails
-            }
-            
-            if (processor.task104(peFile, label, componentData)) {
-                std::cout << "Component added successfully.\n";
-            } else {
-                std::cout << "Failed to add component.\n";
-            }
-            break;
-        }
-            
-        case 2: {
-            // Process component in PE file
-            std::string peFile = getInputPath("Enter PE file path: ");
-            
-            if (!processor.checkFormat92(peFile)) {
-                std::cout << "File does not have a valid PE format.\n";
-                return;
-            }
-            
-            std::cout << "Enter component label to process: ";
-            std::string label;
-            std::cin >> label;
-            
-            // Select encryption algorithm
-            std::cout << "\nSelect encryption algorithm:\n";
-            std::cout << "x - XOR (Basic)\n";
-            std::cout << "k - AES-CBC\n";
-            std::cout << "m - AES-CTR\n";
-            std::cout << "z - ChaCha20\n";
-            std::cout << "p - RC4\n";
-            std::cout << "b - Blowfish\n";
-            std::cout << "t - Twofish\n";
-            std::cout << "s - Serpent\n";
-            std::cout << "c - Camellia\n";
-            std::cout << "g - GCM (Authenticated)\n";
-            std::cout << "y - Poly1305 (Authenticated)\n";
-            std::cout << "Enter your choice: ";
-            
-            char algoChoice;
-            std::cin >> algoChoice;
-            
-            Fx7z9Process mode = Fx7z9Process::Qx3r;
-            auto modeIt = encryptionModes.find(std::tolower(algoChoice));
-            if (modeIt != encryptionModes.end()) {
-                mode = modeIt->second;
-            } else {
-                std::cout << "Invalid algorithm choice. Using XOR as default.\n";
-            }
-            
-            // Get seed/key
-            std::vector<uint8_t> seed = getHexSeed();
-            
-            if (processor.task219(peFile, label, mode, seed)) {
-                std::cout << "Component processed successfully.\n";
-            } else {
-                std::cout << "Failed to process component.\n";
-            }
-            break;
-        }
-            
-        case 3: {
-            // Obfuscate import table
-            std::string peFile = getInputPath("Enter PE file path: ");
-            
-            if (!processor.checkFormat92(peFile)) {
-                std::cout << "File does not have a valid PE format.\n";
-                return;
-            }
-            
-            if (processor.task317(peFile)) {
-                std::cout << "Import table obfuscated successfully.\n";
-            } else {
-                std::cout << "Failed to obfuscate import table.\n";
-            }
-            break;
-        }
-            
-        case 4: {
-            // Obfuscate export table
-            std::string peFile = getInputPath("Enter PE file path: ");
-            
-            if (!processor.checkFormat92(peFile)) {
-                std::cout << "File does not have a valid PE format.\n";
-                return;
-            }
-            
-            if (processor.task318(peFile)) {
-                std::cout << "Export table obfuscated successfully.\n";
-            } else {
-                std::cout << "Failed to obfuscate export table.\n";
-            }
-            break;
-        }
-            
-        case 5: {
-            // Apply complete obfuscation
-            std::string peFile = getInputPath("Enter PE file path: ");
-            
-            if (!processor.checkFormat92(peFile)) {
-                std::cout << "File does not have a valid PE format.\n";
-                return;
-            }
-            
-            bool importSuccess = processor.task317(peFile);
-            bool exportSuccess = processor.task318(peFile);
-            
-            if (importSuccess && exportSuccess) {
-                std::cout << "Complete obfuscation applied successfully.\n";
-            } else {
-                if (!importSuccess) {
-                    std::cout << "Failed to obfuscate import table.\n";
-                }
-                if (!exportSuccess) {
-                    std::cout << "Failed to obfuscate export table.\n";
-                }
-            }
-            break;
-        }
-            
         default:
-            std::cout << "Invalid choice.\n";
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
     }
 }
 
-void displaySecurityMenu() {
-    std::cout << "\n==== Security and Protection Options ====\n";
-    std::cout << "1. Enable memory protection\n";
-    std::cout << "2. Enable file access monitoring\n";
-    std::cout << "3. Enhance random number generation\n";
-    std::cout << "4. Protect specific memory region\n";
-    std::cout << "5. Enable all security features\n";
-    std::cout << "0. Back to Main Menu\n";
-    std::cout << "Enter your choice: ";
-}
-
-void handleSecurityChoice(int choice, KernelHookManager& hookManager) {
-    void* origFunc = NULL;
-    
-    switch (choice) {
-        case 0:
-            return;
-            
-        case 1: {
-            // Enable memory protection
-            HMODULE kernel32 = GetModuleHandleA("kernel32.dll");
-            if (!kernel32) {
-                std::cout << "Failed to get kernel32.dll module handle.\n";
-                return;
-            }
-            
-            void* vpAddr = GetProcAddress(kernel32, "VirtualProtectEx");
-            void* rpmAddr = GetProcAddress(kernel32, "ReadProcessMemory");
-            void* wpmAddr = GetProcAddress(kernel32, "WriteProcessMemory");
-            
-            bool success = true;
-            if (vpAddr) {
-                success &= hookManager.installHook(vpAddr, NULL, &origFunc);
-            }
-            if (rpmAddr) {
-                success &= hookManager.installHook(rpmAddr, NULL, &origFunc);
-            }
-            if (wpmAddr) {
-                success &= hookManager.installHook(wpmAddr, NULL, &origFunc);
-            }
-            
-            if (success) {
-                std::cout << "Memory protection enabled successfully.\n";
-            } else {
-                std::cout << "Failed to enable some memory protection features.\n";
-            }
-            break;
-        }
-            
-        case 2: {
-            // Enable file access monitoring
-            HMODULE kernel32 = GetModuleHandleA("kernel32.dll");
-            if (!kernel32) {
-                std::cout << "Failed to get kernel32.dll module handle.\n";
-                return;
-            }
-            
-            void* cfAddr = GetProcAddress(kernel32, "CreateFileW");
-            
-            if (cfAddr && hookManager.installHook(cfAddr, NULL, &origFunc)) {
-                std::cout << "File access monitoring enabled successfully.\n";
-            } else {
-                std::cout << "Failed to enable file access monitoring.\n";
-            }
-            break;
-        }
-            
-        case 3: {
-            // Enhance random number generation
-            HMODULE advapi32 = GetModuleHandleA("advapi32.dll");
-            if (!advapi32) {
-                std::cout << "Failed to get advapi32.dll module handle.\n";
-                return;
-            }
-            
-            void* cgrAddr = GetProcAddress(advapi32, "CryptGenRandom");
-            
-            if (cgrAddr && hookManager.installHook(cgrAddr, NULL, &origFunc)) {
-                std::cout << "Random number generation enhancement enabled successfully.\n";
-            } else {
-                std::cout << "Failed to enhance random number generation.\n";
-            }
-            break;
-        }
-            
-        case 4: {
-            // Protect specific memory region
-            std::cout << "Enter memory address to protect (hex): ";
-            std::string addrHex;
-            std::cin >> addrHex;
-            
-            void* addr = (void*)std::stoull(addrHex, nullptr, 16);
-            
-            std::cout << "Enter size of region to protect (decimal): ";
-            size_t size;
-            std::cin >> size;
-            
-            try {
-                hookManager.registerProtectedMemory(addr, size);
-                
-                // Make sure memory protection hooks are enabled
-                HMODULE kernel32 = GetModuleHandleA("kernel32.dll");
-                if (kernel32) {
-                    void* vpAddr = GetProcAddress(kernel32, "VirtualProtectEx");
-                    void* rpmAddr = GetProcAddress(kernel32, "ReadProcessMemory");
-                    void* wpmAddr = GetProcAddress(kernel32, "WriteProcessMemory");
-                    
-                    if (vpAddr) hookManager.installHook(vpAddr, NULL, &origFunc);
-                    if (rpmAddr) hookManager.installHook(rpmAddr, NULL, &origFunc);
-                    if (wpmAddr) hookManager.installHook(wpmAddr, NULL, &origFunc);
-                }
-                
-                std::cout << "Memory region protected successfully.\n";
-            } catch (...) {
-                std::cout << "Failed to protect memory region.\n";
-            }
-            break;
-        }
-            
-        case 5: {
-            // Enable all security features
-            if (hookManager.installStandardHooks()) {
-                std::cout << "All security features enabled successfully.\n";
-            } else {
-                std::cout << "Failed to enable some security features.\n";
-            }
-            break;
-        }
-            
-        default:
-            std::cout << "Invalid choice.\n";
-    }
+void handleMenuChoice(int choice) {
+    // This function is kept for compatibility but not used in the simplified version
+    (void)choice;
 }
 
 std::string getInputPath(const std::string& prompt) {
     std::string path;
-    std::cout << prompt;
-    std::cin >> path;
+    std::cout << prompt << ": ";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::getline(std::cin, path);
     return path;
 }
 
-std::vector<std::string> getMultipleInputPaths() {
+std::vector<std::string> getMultipleInputPaths(const std::string& prompt) {
     std::vector<std::string> paths;
+    std::cout << prompt << " (empty line to finish):\n";
+    
     std::string path;
-    
-    std::cout << "Enter file paths (type 'done' when finished):\n";
-    
     while (true) {
-        std::cout << "Path (or 'done'): ";
-        std::cin >> path;
-        
-        if (path == "done") {
-            break;
-        }
-        
+        std::getline(std::cin, path);
+        if (path.empty()) break;
         paths.push_back(path);
     }
     
     return paths;
 }
 
-std::vector<uint8_t> getHexSeed() {
-    std::cout << "Enter encryption key/seed (hex, 32 chars for 16 bytes, press Enter for random): ";
-    std::string seedHex;
-    std::cin.ignore(); // Clear any previous input
-    std::getline(std::cin, seedHex);
+std::string getHexSeed(const std::string& prompt) {
+    std::cout << prompt << " (e.g., 0123456789ABCDEF): ";
+    std::string hexString;
+    std::cin >> hexString;
+    return hexString;
+}
+
+// Stub Generator Menu Functions
+void displayStubMenu() {
+    std::cout << "\n==== Stub Generator ====\n";
+    std::cout << "1. Generate Basic Stub\n";
+    std::cout << "2. Generate Self-Extracting Stub\n";
+    std::cout << "3. Attach File to Stub\n";
+    std::cout << "4. Generate Anti-Analysis Stub\n";
+    std::cout << "0. Back to Main Menu\n";
+    std::cout << "Enter your choice: ";
+}
+
+void handleStubChoice(int choice) {
+    StubGenerator generator;
     
-    std::vector<uint8_t> seed;
-    
-    if (!seedHex.empty()) {
-        // Convert hex string to bytes
-        for (size_t i = 0; i + 1 < seedHex.length(); i += 2) {
-            std::string byteString = seedHex.substr(i, 2);
-            uint8_t byte = (uint8_t)std::stoi(byteString, nullptr, 16);
-            seed.push_back(byte);
+    switch (choice) {
+        case 1: {
+            std::string outputPath = getInputPath("Output stub path");
+            if (outputPath.empty()) return;
+            
+            StubConfig config;
+            config.addEncryption = true;
+            config.addAntiDebug = false;
+            config.addAntiVM = false;
+            config.addPersistence = false;
+            
+            config.outputName = outputPath;
+            if (generator.generateStub(config)) {
+                std::cout << "Basic stub generated: " << outputPath << "\n";
+            } else {
+                std::cout << "Error: Failed to generate stub.\n";
+            }
+            break;
         }
+        
+        case 2: {
+            std::string outputPath = getInputPath("Output stub path");
+            if (outputPath.empty()) return;
+            
+            std::string filePath = getInputPath("File to embed");
+            if (filePath.empty()) return;
+            
+            if (!FileUtils::fileExists(filePath)) {
+                std::cout << "Error: File does not exist.\n";
+                return;
+            }
+            
+            StubConfig config;
+            config.addEncryption = true;
+            config.addAntiDebug = true;
+            config.addAntiVM = true;
+            config.addPersistence = false;
+            
+            config.outputName = outputPath;
+            std::vector<std::string> files = {filePath};
+            if (generator.createSelfExtractingStub(files, config)) {
+                std::cout << "Self-extracting stub generated: " << outputPath << "\n";
+            } else {
+                std::cout << "Error: Failed to generate self-extracting stub.\n";
+            }
+            break;
+        }
+        
+        case 3: {
+            std::string stubPath = getInputPath("Stub file path");
+            if (stubPath.empty()) return;
+            
+            std::string filePath = getInputPath("File to attach");
+            if (filePath.empty()) return;
+            
+            std::string outputPath = getInputPath("Output executable path");
+            if (outputPath.empty()) return;
+            
+            if (!FileUtils::fileExists(stubPath)) {
+                std::cout << "Error: Stub file does not exist.\n";
+                return;
+            }
+            
+            if (!FileUtils::fileExists(filePath)) {
+                std::cout << "Error: File to attach does not exist.\n";
+                return;
+            }
+            
+            if (generator.attachFileToStub(stubPath, filePath, outputPath)) {
+                std::cout << "File attached to stub: " << outputPath << "\n";
+            } else {
+                std::cout << "Error: Failed to attach file to stub.\n";
+            }
+            break;
+        }
+        
+        case 4: {
+            std::string outputPath = getInputPath("Output stub path");
+            if (outputPath.empty()) return;
+            
+            StubConfig config;
+            config.addEncryption = true;
+            config.addAntiDebug = true;
+            config.addAntiVM = true;
+            config.addPersistence = true;
+            
+            config.outputName = outputPath;
+            if (generator.generateStub(config)) {
+                std::cout << "Anti-analysis stub generated: " << outputPath << "\n";
+            } else {
+                std::cout << "Error: Failed to generate anti-analysis stub.\n";
+            }
+            break;
+        }
+        
+        case 0:
+            return;
+            
+        default:
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
     }
+}
+
+// Drag and Drop Menu Functions
+void displayDragDropMenu() {
+    std::cout << "\n==== Drag and Drop Interface ====\n";
+    std::cout << "1. Initialize Drag and Drop\n";
+    std::cout << "2. Enable/Disable Drag and Drop\n";
+    std::cout << "3. Set Drop Callback\n";
+    std::cout << "0. Back to Main Menu\n";
+    std::cout << "Enter your choice: ";
+}
+
+void handleDragDropChoice(int choice) {
+    static DragDropHandler* handler = nullptr;
     
-    return seed;
+    switch (choice) {
+        case 1: {
+            if (handler) {
+                delete handler;
+            }
+            
+            handler = new DragDropHandler();
+            
+            // For console applications, we'll use a dummy window handle
+            // In a real GUI application, you would pass the actual window handle
+            HWND consoleWindow = GetConsoleWindow();
+            
+            if (handler->initialize(consoleWindow)) {
+                std::cout << "Drag and drop initialized successfully.\n";
+            } else {
+                std::cout << "Error: Failed to initialize drag and drop.\n";
+                delete handler;
+                handler = nullptr;
+            }
+            break;
+        }
+        
+        case 2: {
+            if (!handler) {
+                std::cout << "Error: Drag and drop not initialized.\n";
+                return;
+            }
+            
+            std::cout << "Enable drag and drop? (y/N): ";
+            char enable;
+            std::cin >> enable;
+            
+            if (enable == 'y' || enable == 'Y') {
+                if (handler->enableDragDrop(true)) {
+                    std::cout << "Drag and drop enabled.\n";
+                } else {
+                    std::cout << "Error: Failed to enable drag and drop.\n";
+                }
+            } else {
+                if (handler->enableDragDrop(false)) {
+                    std::cout << "Drag and drop disabled.\n";
+                } else {
+                    std::cout << "Error: Failed to disable drag and drop.\n";
+                }
+            }
+            break;
+        }
+        
+        case 3: {
+            if (!handler) {
+                std::cout << "Error: Drag and drop not initialized.\n";
+                return;
+            }
+            
+            std::cout << "Setting drop callback...\n";
+            handler->setDropCallback([](const DragDrop::DropEvent& event) {
+                std::cout << "Files dropped:\n";
+                for (const auto& file : event.files) {
+                    std::wcout << L"  " << file << L"\n";
+                }
+            });
+            
+            std::cout << "Drop callback set successfully.\n";
+            break;
+        }
+        
+        case 0:
+            if (handler) {
+                delete handler;
+                handler = nullptr;
+            }
+            return;
+            
+        default:
+            std::cout << "Invalid choice. Please try again.\n";
+            break;
+    }
 }

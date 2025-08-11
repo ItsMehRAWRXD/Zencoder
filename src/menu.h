@@ -1,24 +1,13 @@
-#include <iostream>
-#include "menu.h"
-
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the Encryption and Packing Tool!" << std::endl;
-
-    // Display the menu and handle user input
-    displayMenu();
-
-    return 0;
-}
-
 #pragma once
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
-// Forward declaration of needed classes
-class Z3Processor;
-class KernelHookManager;
+// Forward declarations
+class AESCBC;
+class StubGenerator;
+class DragDropHandler;
 
 // Menu display and handling functions
 void displayMenu();
@@ -26,21 +15,21 @@ void handleMenuChoice(int choice);
 
 // Encryption submenu
 void displayEncryptionMenu();
-void handleEncryptionChoice(int choice, Z3Processor& processor);
+void handleEncryptionChoice(int choice);
 
-// Packing submenu
-void displayPackingMenu();
-void handlePackingChoice(int choice, Z3Processor& processor);
+// File operations submenu
+void displayFileMenu();
+void handleFileChoice(int choice);
 
-// PE manipulation submenu
-void displayPEMenu();
-void handlePEManipulationChoice(int choice, Z3Processor& processor, KernelHookManager& hookManager);
+// Stub generator submenu
+void displayStubMenu();
+void handleStubChoice(int choice);
 
-// Security and hooks submenu
-void displaySecurityMenu();
-void handleSecurityChoice(int choice, KernelHookManager& hookManager);
+// Drag and drop submenu
+void displayDragDropMenu();
+void handleDragDropChoice(int choice);
 
 // Utility functions
 std::string getInputPath(const std::string& prompt);
-std::vector<std::string> getMultipleInputPaths();
-std::vector<uint8_t> getHexSeed();
+std::vector<std::string> getMultipleInputPaths(const std::string& prompt);
+std::string getHexSeed(const std::string& prompt);
