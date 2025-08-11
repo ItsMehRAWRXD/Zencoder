@@ -414,11 +414,7 @@ void handleDragDropChoice(int choice) {
             
             // For console applications, we'll use a dummy window handle
             // In a real GUI application, you would pass the actual window handle
-#ifdef _WIN32
             HWND consoleWindow = GetConsoleWindow();
-#else
-            void* consoleWindow = nullptr;
-#endif
             
             if (handler->initialize(consoleWindow)) {
                 std::cout << "Drag and drop initialized successfully.\n";
