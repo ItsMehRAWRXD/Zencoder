@@ -1,11 +1,11 @@
-# My Crypto Project
+# Rawr - Advanced Encryption & File Processing Toolkit
 
 ## Description
-This is a crypto utility project based on Zencoder. It provides a foundation for building encryption and file manipulation tools with various cryptographic algorithms.
+Rawr is a powerful encryption and file manipulation toolkit based on the Zencoder framework. It provides multiple cryptographic algorithms, file packing capabilities, and PE file manipulation features for Windows.
 
 ## Features
 
-### Available Encryption Algorithms
+### 🔐 Encryption Algorithms
 - **AES-CBC** - Advanced Encryption Standard with Cipher Block Chaining
 - **AES-CTR** - Advanced Encryption Standard with Counter mode
 - **ChaCha20** - Modern stream cipher
@@ -17,84 +17,151 @@ This is a crypto utility project based on Zencoder. It provides a foundation for
 - **GCM** - Galois/Counter Mode authenticated encryption
 - **Poly1305** - Cryptographic message authentication
 
-### Core Capabilities
+### 📦 Core Capabilities
 - File and folder encryption/decryption
 - Multi-file packing with encryption
 - PE file manipulation (Windows)
+- Memory protection and kernel hooks
 - Secure key generation and management
 
 ## Getting Started
 
 ### Prerequisites
-- Visual Studio 2022 with C++ toolset (v143)
-- Windows SDK 10.0
-- C++17 standard support
+- C++ compiler with C++17 support (g++, clang, MSVC)
+- CMake 3.16 or higher (for CMake build)
+- Visual Studio 2022 (for VS solution)
+- Windows SDK 10.0 (for Windows features)
 
-### Building the Project
+### Building with CMake
 
-#### Using Visual Studio
-1. Open `Zencoder.sln` in Visual Studio 2022
-2. Select your desired configuration (Debug/Release) and platform (x86/x64)
-3. Build the solution (Ctrl+Shift+B)
-
-#### Using Command Line (Windows)
 ```bash
-# Build using MSBuild
-msbuild Zencoder.sln /p:Configuration=Release /p:Platform=x64
+# Create build directory
+mkdir build && cd build
+
+# Configure
+cmake ..
+
+# Build
+cmake --build .
+
+# Run
+./bin/rawr
+```
+
+### Building with Visual Studio
+1. Open `Zencoder.sln` in Visual Studio 2022
+2. Select configuration (Debug/Release) and platform (x86/x64)
+3. Build solution (Ctrl+Shift+B)
+
+### Building with g++ (Simple Example)
+```bash
+# Build the simple encryption example
+g++ -std=c++17 examples/simple_encryption.cpp -o simple_encrypt
+
+# Build the simplified main
+g++ -std=c++17 simple_main.cpp -o rawr_simple
 ```
 
 ## Project Structure
 
 ```
-my-crypto-project/
-├── src/                    # Source files
+Rawr/
+├── driver/                 # Kernel driver components
 ├── encryption/             # Encryption algorithm implementations
 ├── include/                # Header files
-├── utils/                  # Utility functions
+├── src/                    # Additional source files
+├── test/                   # Test files
 ├── types/                  # Type definitions
-├── main.cpp               # Application entry point
+├── utils/                  # Utility functions
+├── examples/               # Example implementations
+│   └── simple_encryption.cpp
+├── main.cpp               # Full-featured entry point
+├── simple_main.cpp        # Simplified entry point
 ├── menu.cpp               # Menu system implementation
 ├── packer.cpp             # File packing functionality
-└── Zencoder.sln          # Visual Studio solution file
+├── CMakeLists.txt         # CMake build configuration
+└── README.md              # This file
 ```
 
-## Customization Guide
+## Usage
+
+### Option 1: Full Featured Application
+```bash
+./rawr
+```
+This launches the complete application with all features:
+- Encryption/Decryption operations
+- File packing operations
+- PE file manipulation
+- Security and protection options
+
+### Option 2: Simplified Interface
+```bash
+./rawr_simple
+```
+A cleaner, simpler interface ideal for:
+- Learning the codebase
+- Basic encryption tasks
+- Custom development base
+
+### Option 3: Example Programs
+```bash
+./simple_encrypt
+```
+Standalone encryption example for quick file encryption/decryption.
+
+## Development Guide
 
 ### Adding New Features
-1. **New Encryption Algorithm**: Add implementation in `encryption/` directory
+1. **New Encryption Algorithm**: Add implementation in `encryption/`
 2. **New Menu Option**: Modify `menu.cpp` and `menu.h`
-3. **New Functionality**: Create new source files in `src/`
+3. **New Functionality**: Create source files in `src/`
 
-### Simplifying the Project
-If you want a simpler version:
-1. Remove unused encryption algorithms from `encryption/`
-2. Simplify the menu system in `menu.cpp`
-3. Focus on specific features you need
+### Using with Augment (VS Code)
+This project is perfect for use with the Augment AI coding assistant:
+- Complex algorithms to explain
+- TODO items to implement
+- Refactoring opportunities
+- Security improvements
 
-## Usage Example
+See `AUGMENT_SETUP.md` for detailed Augment usage guide.
 
+## Examples
+
+### Basic File Encryption
 ```cpp
-// Basic file encryption example
-#include "encryption/aes_cbc.h"
-
-int main() {
-    // Your encryption logic here
-    return 0;
-}
+// Using the simple encryptor
+SimpleEncryptor enc("mypassword");
+auto encrypted = enc.encrypt(readFile("input.txt"));
+writeFile("output.enc", encrypted);
 ```
 
-## Next Steps
-1. Rename the Visual Studio solution and project files to match your project name
-2. Customize the menu options in `menu.cpp` for your specific use case
-3. Remove any unnecessary features or encryption algorithms
-4. Add your own custom functionality
+### Using with Menu System
+```cpp
+// The menu system provides interactive options
+// Run ./rawr and select:
+// 1. Encryption/Decryption Operations
+// 2. Choose your algorithm
+// 3. Select files to process
+```
 
 ## Security Notice
-This tool implements cryptographic algorithms. Always ensure:
+This toolkit implements cryptographic algorithms. Always ensure:
 - Proper key management
-- Secure random number generation
-- Appropriate algorithm selection for your use case
-- Compliance with relevant regulations
+- Secure random number generation  
+- Appropriate algorithm selection
+- Compliance with regulations
+- Authorization for use on target systems
+
+## Contributing
+Feel free to contribute by:
+- Adding new encryption algorithms
+- Improving existing implementations
+- Adding tests
+- Enhancing documentation
 
 ## License
-[Add your license here]
+[Add your license information here]
+
+---
+Built with ❤️ for secure file processing and encryption needs.
