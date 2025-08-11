@@ -57,8 +57,8 @@ brew install cmake openssl
 ```
 
 #### Windows
-- Install Visual Studio 2019 or later with C++ support
-- Install CMake from https://cmake.org/
+- Install Visual Studio 2022 with C++ support (see [WINDOWS_SETUP.md](WINDOWS_SETUP.md) for detailed instructions)
+- Install CMake from https://cmake.org/ (or use the one included with Visual Studio)
 - Install OpenSSL from https://slproweb.com/products/Win32OpenSSL.html
 
 ## Building the Project
@@ -70,6 +70,20 @@ cd zencoder
 ```
 
 ### Build Instructions
+
+#### Windows (Visual Studio 2022)
+```cmd
+# Use the Windows build script (recommended)
+build.bat
+
+# Or use CMake directly
+mkdir build
+cd build
+cmake .. -G "Visual Studio 17 2022" -A x64
+cmake --build . --config Release
+```
+
+#### Linux/macOS
 ```bash
 # Create build directory
 mkdir build
@@ -79,9 +93,7 @@ cd build
 cmake ..
 
 # Build the project
-make -j$(nproc)  # Linux/macOS
-# or
-cmake --build . --config Release  # Windows
+make -j$(nproc)
 ```
 
 ### Install (Optional)
@@ -96,6 +108,17 @@ make install DESTDIR=/path/to/install
 ## Usage
 
 ### Running the Application
+
+#### Windows
+```cmd
+# From build directory
+build\bin\Release\zencoder.exe
+
+# Or if installed system-wide
+zencoder.exe
+```
+
+#### Linux/macOS
 ```bash
 # From build directory
 ./bin/zencoder
