@@ -1,5 +1,5 @@
-#ifndef FILE_UTILS_H
-#define FILE_UTILS_H
+#ifndef FILE_HELPER_H
+#define FILE_HELPER_H
 
 #include <string>
 #include <vector>
@@ -14,4 +14,4 @@ size_t getFileSize(const std::string& path);
 
 } // namespace FileUtils
 
-#endif // FILE_UTILS_H
+#endif // FILE_HELPER_H
