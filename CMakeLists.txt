@@ -70,6 +70,7 @@ set(SOURCES
     src/packer.cpp
     src/encryption/aes_cbc.cpp
     src/utils/file_utils.cpp
+    src/utils/logging.cpp
 )
 
 # Header files
@@ -79,6 +80,7 @@ set(HEADERS
     src/packer.h
     src/encryption/aes_cbc.h
     src/utils/file_utils.h
+    src/utils/logging.h
     types/enums.h
 )
 
