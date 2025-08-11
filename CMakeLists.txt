@@ -113,10 +113,16 @@ install(TARGETS zencoder DESTINATION bin)
 
 # Add test target
 enable_testing()
-add_executable(zencoder_test test/simple_test.cpp ${SOURCES})
-target_link_libraries(zencoder_test zencoder)
+add_executable(zencoder_test test/simple_test.cpp src/menu.cpp src/packer.cpp src/encryption/aes_cbc.cpp src/utils/file_utils.cpp src/utils/logging.cpp)
+target_link_libraries(zencoder_test OpenSSL::SSL OpenSSL::Crypto)
+if(WIN32)
+    target_link_libraries(zencoder_test ${WINDOWS_LIBS})
+endif()
 add_test(NAME ZencoderTest COMMAND zencoder_test)
 
 # Add example target
-add_executable(zencoder_example examples/basic_usage.cpp ${SOURCES})
-target_link_libraries(zencoder_example zencoder)
+add_executable(zencoder_example examples/basic_usage.cpp src/menu.cpp src/packer.cpp src/encryption/aes_cbc.cpp src/utils/file_utils.cpp src/utils/logging.cpp)
+target_link_libraries(zencoder_example OpenSSL::SSL OpenSSL::Crypto)
+if(WIN32)
+    target_link_libraries(zencoder_example ${WINDOWS_LIBS})
+endif()
