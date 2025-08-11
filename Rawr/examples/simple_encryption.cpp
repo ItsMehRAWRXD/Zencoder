@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <cstdint>
 #include <cstring>
 
 // Simple XOR encryption for demonstration

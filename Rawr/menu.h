@@ -4,13 +4,7 @@
 #include <string>
 #include <vector>
 
-#ifdef _WIN32
 #include <windows.h>
-#else
-#include <cstdint>
-typedef uint32_t DWORD;
-typedef void* HANDLE;
-#endif
 
 // Forward declarations
 class Z3Processor;

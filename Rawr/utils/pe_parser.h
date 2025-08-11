@@ -5,11 +5,7 @@
 #include <string>
 #include <cstdint>
 
-#ifdef _WIN32
 #include <windows.h>
-#else
-#include "pe_defs.h"
-#endif
 
 // PE parsing utilities
 class PEParser {
