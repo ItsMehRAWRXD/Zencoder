@@ -1,0 +1,152 @@
+{
+  "models": [
+    {
+      "title": "🐬 Dolphin Llama3 8B (Fast)",
+      "provider": "ollama",
+      "model": "dolphin-llama3:8b",
+      "apiBase": "http://localhost:11434",
+      "contextLength": 8192,
+      "completionOptions": {
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0
+      }
+    },
+    {
+      "title": "🐬 Dolphin Mixtral 8x7B (Powerful)",
+      "provider": "ollama", 
+      "model": "dolphin-mixtral:8x7b",
+      "apiBase": "http://localhost:11434",
+      "contextLength": 32768,
+      "completionOptions": {
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0
+      }
+    },
+    {
+      "title": "🧙 Wizard Vicuna Uncensored 13B",
+      "provider": "ollama",
+      "model": "wizard-vicuna-uncensored:13b",
+      "apiBase": "http://localhost:11434",
+      "contextLength": 4096,
+      "completionOptions": {
+        "temperature": 0.8,
+        "top_p": 0.95,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0
+      }
+    },
+    {
+      "title": "🔥 Nous Hermes2 10.7B (Balanced)",
+      "provider": "ollama",
+      "model": "nous-hermes2:10.7b",
+      "apiBase": "http://localhost:11434",
+      "contextLength": 8192,
+      "completionOptions": {
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0
+      }
+    },
+    {
+      "title": "⚡ OpenHermes 7B (Quick)",
+      "provider": "ollama",
+      "model": "openhermes:7b",
+      "apiBase": "http://localhost:11434",
+      "contextLength": 8192,
+      "completionOptions": {
+        "temperature": 0.6,
+        "top_p": 0.85,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0
+      }
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "🐬 Dolphin Autocomplete",
+    "provider": "ollama",
+    "model": "dolphin-llama3:8b",
+    "apiBase": "http://localhost:11434",
+    "contextLength": 2048,
+    "completionOptions": {
+      "temperature": 0.3,
+      "top_p": 0.7,
+      "max_tokens": 50,
+      "stop": ["\n\n", "```"]
+    }
+  },
+  "customCommands": [
+    {
+      "name": "explain",
+      "prompt": "Please explain this code in detail, including what it does, how it works, and any potential improvements:",
+      "description": "Explain selected code"
+    },
+    {
+      "name": "debug",
+      "prompt": "Help me debug this code. Look for potential bugs, edge cases, and suggest fixes:",
+      "description": "Debug selected code"
+    },
+    {
+      "name": "optimize",
+      "prompt": "Review this code for performance optimizations. Suggest improvements for speed, memory usage, and best practices:",
+      "description": "Optimize selected code"
+    },
+    {
+      "name": "test",
+      "prompt": "Generate comprehensive unit tests for this code, including edge cases and error conditions:",
+      "description": "Generate tests for code"
+    },
+    {
+      "name": "refactor",
+      "prompt": "Refactor this code to improve readability, maintainability, and follow best practices:",
+      "description": "Refactor selected code"
+    },
+    {
+      "name": "comment",
+      "prompt": "Add comprehensive comments and documentation to this code:",
+      "description": "Add comments to code"
+    }
+  ],
+  "contextProviders": [
+    {
+      "name": "diff",
+      "params": {}
+    },
+    {
+      "name": "folder",
+      "params": {}
+    },
+    {
+      "name": "codebase",
+      "params": {}
+    }
+  ],
+  "slashCommands": [
+    {
+      "name": "edit",
+      "description": "Edit selected code"
+    },
+    {
+      "name": "comment",
+      "description": "Add comments to code"
+    },
+    {
+      "name": "share",
+      "description": "Share code snippet"
+    },
+    {
+      "name": "cmd",
+      "description": "Generate terminal command"
+    }
+  ],
+  "allowAnonymousTelemetry": false,
+  "embeddingsProvider": {
+    "provider": "ollama",
+    "model": "nomic-embed-text",
+    "apiBase": "http://localhost:11434"
+  }
+}
