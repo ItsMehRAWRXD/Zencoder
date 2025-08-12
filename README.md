@@ -1,373 +1,257 @@
-#include <iostream>
-#include "menu.h"
+# Ollama + Cursor + Uncensored AI POC
 
-int main() {
-    // Initialize the application
-    std::cout << "Welcome to the Encryption and Packing Tool!" << std::endl;
+A complete proof-of-concept setup for running **uncensored AI models locally** with **Ollama** and integrating them with **Cursor IDE** for private, unrestricted coding assistance.
 
-    // Display the menu and handle user input
-    while (true) {
-        int choice = displayMenu();
-        if (choice == 0) {
-            break; // Exit the application
-        }
-        handleUserChoice(choice);
-    }
+## 🎯 What This Provides
 
-    return 0;
+✅ **Complete Privacy** - All AI processing happens locally on your machine  
+✅ **No Censorship** - Use uncensored models for unrestricted assistance  
+✅ **No API Costs** - Free to use once set up  
+✅ **Offline Capable** - Works without internet connection  
+✅ **Production Ready** - Automated setup and configuration  
+
+## 🚀 Quick Start
+
+### Option 1: Automated Setup (Recommended)
+
+```bash
+# Make the quick start script executable
+chmod +x examples/quick_start.sh
+
+# Run the automated setup
+./examples/quick_start.sh
+```
+
+This script will:
+- Install Ollama
+- Download uncensored AI models
+- Configure Cursor IDE
+- Set up Continue extension
+- Test the entire setup
+
+### Option 2: Manual Setup
+
+```bash
+# 1. Install Ollama and models
+chmod +x install_ollama.sh
+./install_ollama.sh
+
+# 2. Follow configuration guide
+# See cursor_config.md for detailed instructions
+```
+
+## 📋 What Gets Installed
+
+### Uncensored AI Models
+
+| Model | Size | Best For | RAM Required |
+|-------|------|----------|--------------|
+| **dolphin-llama3:8b** | ~4.7GB | Fast coding, autocomplete | 8GB+ |
+| **nous-hermes2:10.7b** | ~6.3GB | Balanced performance | 8GB+ |
+| **openhermes:7b** | ~4.1GB | Quick responses | 6GB+ |
+| **dolphin-mixtral:8x7b** | ~26GB | Complex reasoning | 16GB+ |
+| **wizard-vicuna-uncensored:13b** | ~7.3GB | Advanced tasks | 16GB+ |
+
+### Cursor Integration
+
+- **Chat Interface** - Use `Ctrl+K` to chat with AI
+- **Inline Editing** - Use `Ctrl+I` for code suggestions
+- **Autocomplete** - Tab completion powered by local AI
+- **Custom Commands** - Explain, debug, optimize, test code
+
+## 🔧 Usage Examples
+
+### In Cursor IDE
+
+1. **Chat with AI** - Press `Ctrl+K` (or `Cmd+K`)
+   ```
+   You: "Create a REST API for user authentication"
+   AI: [Provides complete, uncensored code]
+   ```
+
+2. **Inline Code Generation** - Press `Ctrl+I` (or `Cmd+I`)
+   ```python
+   # Select code and press Ctrl+I
+   def fibonacci(n):
+       # AI will complete this function
+   ```
+
+3. **Code Explanation** - Select code and use `/explain`
+4. **Debug Code** - Select code and use `/debug`
+5. **Generate Tests** - Select code and use `/test`
+
+### Programmatic Usage
+
+```python
+# Test the setup
+python3 examples/test_ollama.py
+
+# Use the OllamaClient class in your projects
+from examples.test_ollama import OllamaClient
+
+client = OllamaClient()
+response = client.generate("dolphin-llama3:8b", "Write a Python function")
+print(response)
+```
+
+## 📁 Project Structure
+
+```
+ollama-cursor-uncensored-poc/
+├── install_ollama.sh              # Basic Ollama setup script
+├── cursor_config.md               # Detailed configuration guide
+├── README.md                      # This file
+└── examples/
+    ├── quick_start.sh             # Automated full setup
+    ├── test_ollama.py             # Python test script
+    └── continue_config.json       # Continue extension config
+```
+
+## 🛠️ System Requirements
+
+### Minimum Requirements
+- **OS**: Linux (Ubuntu, Debian, CentOS, etc.)
+- **RAM**: 8GB (for basic models)
+- **Storage**: 20GB free space
+- **CPU**: x64 architecture
+
+### Recommended Requirements
+- **RAM**: 16GB+ (for larger models)
+- **Storage**: 50GB+ free space
+- **GPU**: NVIDIA GPU with CUDA (optional, for faster inference)
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+**Ollama not starting:**
+```bash
+sudo systemctl status ollama
+sudo systemctl restart ollama
+```
+
+**Models running slowly:**
+```bash
+# Use smaller models
+ollama pull openhermes:7b
+```
+
+**Out of memory:**
+```bash
+# Check system resources
+free -h
+htop
+
+# Restart Ollama service
+sudo systemctl restart ollama
+```
+
+**Cursor not connecting:**
+1. Verify Ollama is running: `curl http://localhost:11434/api/tags`
+2. Check Cursor settings in `~/.cursor/User/settings.json`
+3. Restart Cursor after configuration changes
+
+### Useful Commands
+
+```bash
+# Check Ollama status
+systemctl status ollama
+
+# List installed models
+ollama list
+
+# Test a model directly
+ollama run dolphin-llama3:8b "Hello, write Python code"
+
+# View Ollama logs
+journalctl -u ollama -f
+
+# Check system resources
+free -h && df -h
+```
+
+## 🔒 Privacy & Security
+
+### Data Privacy
+- **All processing is local** - No data leaves your machine
+- **No telemetry** - Configured to disable all tracking
+- **Offline capable** - Works without internet connection
+
+### Model Safety
+- **Uncensored models** can generate any type of content
+- **Use responsibly** - Consider ethical implications
+- **Content filtering** - You are responsible for appropriate use
+
+### Security Considerations
+- Models run with user permissions (not root)
+- API only accessible locally (localhost:11434)
+- No external network connections required
+
+## 🎨 Customization
+
+### Adding More Models
+
+```bash
+# Browse available models
+ollama search llama
+
+# Pull additional models
+ollama pull codellama:13b
+ollama pull deepseek-coder:6.7b
+ollama pull starcoder:15b
+```
+
+### Cursor Settings
+
+Edit `~/.cursor/User/settings.json`:
+```json
+{
+    "cursor.chat.model": "ollama/your-preferred-model",
+    "cursor.autocomplete.enabled": true,
+    "cursor.autocomplete.model": "ollama/fast-model"
 }
 ```
 
-**src/menu.cpp**
-```cpp
-#include <iostream>
-#include "menu.h"
+### Continue Extension Config
 
-int displayMenu() {
-    std::cout << "Select an option:" << std::endl;
-    std::cout << "1. AES-CBC Encryption" << std::endl;
-    std::cout << "2. AES-CTR Encryption" << std::endl;
-    std::cout << "3. Blowfish Encryption" << std::endl;
-    std::cout << "4. Camellia Encryption" << std::endl;
-    std::cout << "5. ChaCha20 Encryption" << std::endl;
-    std::cout << "6. GCM Encryption" << std::endl;
-    std::cout << "7. Poly1305 Authentication" << std::endl;
-    std::cout << "8. RC4 Encryption" << std::endl;
-    std::cout << "9. Serpent Encryption" << std::endl;
-    std::cout << "10. Twofish Encryption" << std::endl;
-    std::cout << "11. Repack Files" << std::endl;
-    std::cout << "0. Exit" << std::endl;
+Edit `~/.continue/config.json` to add custom models, commands, and settings.
 
-    int choice;
-    std::cin >> choice;
-    return choice;
-}
+## 📈 Performance Tips
 
-void handleUserChoice(int choice) {
-    switch (choice) {
-        case 1:
-            // Call AES-CBC encryption function
-            break;
-        case 2:
-            // Call AES-CTR encryption function
-            break;
-        case 3:
-            // Call Blowfish encryption function
-            break;
-        case 4:
-            // Call Camellia encryption function
-            break;
-        case 5:
-            // Call ChaCha20 encryption function
-            break;
-        case 6:
-            // Call GCM encryption function
-            break;
-        case 7:
-            // Call Poly1305 authentication function
-            break;
-        case 8:
-            // Call RC4 encryption function
-            break;
-        case 9:
-            // Call Serpent encryption function
-            break;
-        case 10:
-            // Call Twofish encryption function
-            break;
-        case 11:
-            // Call repack files function
-            break;
-        default:
-            std::cout << "Invalid choice. Please try again." << std::endl;
-            break;
-    }
-}
-```
+### For Better Speed
+1. Use smaller models for autocomplete: `openhermes:7b`
+2. Use larger models for complex tasks: `dolphin-mixtral:8x7b`
+3. Enable GPU acceleration if available
+4. Increase system RAM if possible
 
-**src/menu.h**
-```cpp
-#ifndef MENU_H
-#define MENU_H
+### For Better Quality
+1. Use larger models: `wizard-vicuna-uncensored:13b`
+2. Adjust temperature settings in config
+3. Use model-specific prompting techniques
+4. Fine-tune context length based on needs
 
-int displayMenu();
-void handleUserChoice(int choice);
+## 🤝 Contributing
 
-#endif // MENU_H
-```
+This is a proof-of-concept project. Feel free to:
+- Report issues and bugs
+- Suggest improvements
+- Add support for other editors
+- Contribute additional models or configurations
 
-**src/encryption/aes_cbc.cpp**
-```cpp
-#include "aes_cbc.h"
+## ⚖️ Legal & Ethical Notice
 
-// Implementation of AES-CBC encryption algorithm
-```
+- **Educational Purpose**: This POC is for educational and research purposes
+- **Responsible Use**: Users are responsible for ethical and legal use
+- **Model Licenses**: Respect individual model licenses and terms
+- **Content Warning**: Uncensored models can generate inappropriate content
 
-**src/encryption/aes_cbc.h**
-```cpp
-#ifndef AES_CBC_H
-#define AES_CBC_H
+## 📚 Additional Resources
 
-// Declarations for AES-CBC encryption functions
+- [Ollama Documentation](https://ollama.com/docs)
+- [Cursor IDE Documentation](https://cursor.sh/docs)
+- [Continue Extension](https://github.com/continuedev/continue)
+- [Model Hub](https://ollama.com/library)
 
-#endif // AES_CBC_H
-```
+---
 
-**src/encryption/aes_ctr.cpp**
-```cpp
-#include "aes_ctr.h"
-
-// Implementation of AES-CTR encryption algorithm
-```
-
-**src/encryption/aes_ctr.h**
-```cpp
-#ifndef AES_CTR_H
-#define AES_CTR_H
-
-// Declarations for AES-CTR encryption functions
-
-#endif // AES_CTR_H
-```
-
-**src/encryption/blowfish.cpp**
-```cpp
-#include "blowfish.h"
-
-// Implementation of Blowfish encryption algorithm
-```
-
-**src/encryption/blowfish.h**
-```cpp
-#ifndef BLOWFISH_H
-#define BLOWFISH_H
-
-// Declarations for Blowfish encryption functions
-
-#endif // BLOWFISH_H
-```
-
-**src/encryption/camellia.cpp**
-```cpp
-#include "camellia.h"
-
-// Implementation of Camellia encryption algorithm
-```
-
-**src/encryption/camellia.h**
-```cpp
-#ifndef CAMELLIA_H
-#define CAMELLIA_H
-
-// Declarations for Camellia encryption functions
-
-#endif // CAMELLIA_H
-```
-
-**src/encryption/chacha20.cpp**
-```cpp
-#include "chacha20.h"
-
-// Implementation of ChaCha20 encryption algorithm
-```
-
-**src/encryption/chacha20.h**
-```cpp
-#ifndef CHACHA20_H
-#define CHACHA20_H
-
-// Declarations for ChaCha20 encryption functions
-
-#endif // CHACHA20_H
-```
-
-**src/encryption/encryption_base.cpp**
-```cpp
-#include "encryption_base.h"
-
-// Implementation of base class for encryption algorithms
-```
-
-**src/encryption/encryption_base.h**
-```cpp
-#ifndef ENCRYPTION_BASE_H
-#define ENCRYPTION_BASE_H
-
-// Declarations for base class for encryption algorithms
-
-#endif // ENCRYPTION_BASE_H
-```
-
-**src/encryption/gcm.cpp**
-```cpp
-#include "gcm.h"
-
-// Implementation of GCM encryption algorithm
-```
-
-**src/encryption/gcm.h**
-```cpp
-#ifndef GCM_H
-#define GCM_H
-
-// Declarations for GCM encryption functions
-
-#endif // GCM_H
-```
-
-**src/encryption/poly1305.cpp**
-```cpp
-#include "poly1305.h"
-
-// Implementation of Poly1305 authentication algorithm
-```
-
-**src/encryption/poly1305.h**
-```cpp
-#ifndef POLY1305_H
-#define POLY1305_H
-
-// Declarations for Poly1305 authentication functions
-
-#endif // POLY1305_H
-```
-
-**src/encryption/rc4.cpp**
-```cpp
-#include "rc4.h"
-
-// Implementation of RC4 encryption algorithm
-```
-
-**src/encryption/rc4.h**
-```cpp
-#ifndef RC4_H
-#define RC4_H
-
-// Declarations for RC4 encryption functions
-
-#endif // RC4_H
-```
-
-**src/encryption/serpent.cpp**
-```cpp
-#include "serpent.h"
-
-// Implementation of Serpent encryption algorithm
-```
-
-**src/encryption/serpent.h**
-```cpp
-#ifndef SERPENT_H
-#define SERPENT_H
-
-// Declarations for Serpent encryption functions
-
-#endif // SERPENT_H
-```
-
-**src/encryption/twofish.cpp**
-```cpp
-#include "twofish.h"
-
-// Implementation of Twofish encryption algorithm
-```
-
-**src/encryption/twofish.h**
-```cpp
-#ifndef TWOFISH_H
-#define TWOFISH_H
-
-// Declarations for Twofish encryption functions
-
-#endif // TWOFISH_H
-```
-
-**src/utils/file_utils.cpp**
-```cpp
-#include "file_utils.h"
-
-// Implementation of utility functions for file operations
-```
-
-**src/utils/file_utils.h**
-```cpp
-#ifndef FILE_UTILS_H
-#define FILE_UTILS_H
-
-// Declarations for utility functions for file operations
-
-#endif // FILE_UTILS_H
-```
-
-**src/utils/logging.cpp**
-```cpp
-#include "logging.h"
-
-// Implementation of logging functionality
-```
-
-**src/utils/logging.h**
-```cpp
-#ifndef LOGGING_H
-#define LOGGING_H
-
-// Declarations for logging functions
-
-#endif // LOGGING_H
-```
-
-**src/types/enums.h**
-```cpp
-#ifndef ENUMS_H
-#define ENUMS_H
-
-// Enumeration definitions for encryption types
-
-#endif // ENUMS_H
-```
-
-**CMakeLists.txt**
-```cmake
-cmake_minimum_required(VERSION 3.10)
-project(EncryptionPacker)
-
-set(CMAKE_CXX_STANDARD 17)
-
-include_directories(src)
-
-file(GLOB SOURCES "src/*.cpp" "src/encryption/*.cpp" "src/utils/*.cpp" "src/types/*.cpp")
-
-add_executable(EncryptionPacker ${SOURCES})
-```
-
-**.gitignore**
-```
-build/
-*.o
-*.exe
-*.out
-*.old
-```
-
-**README.md**
-```
-# Encryption and Packing Tool
-
-## Description
-This project provides a tool for encrypting files using various algorithms and repacking them.
-
-## Building the Project
-To build the project, use the following commands:
-```
-mkdir build
-cd build
-cmake ..
-make
-```
-
-## Usage
-Run the executable and follow the on-screen instructions to select encryption methods and repack files.
-```
-
-This structure provides a complete framework for your project, allowing for the selection of various encryption methods and repacking functionality.
+**Enjoy your private, uncensored AI coding assistant! 🚀**
