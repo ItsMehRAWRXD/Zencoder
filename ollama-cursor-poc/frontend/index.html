@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Cursor POC - Uncensored AI Chat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Ollama Cursor POC</h1>
+            <p class="subtitle">Uncensored AI Chat Interface</p>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="model-selector">
+                    <h3>Select Model</h3>
+                    <select id="modelSelect" class="model-dropdown">
+                        <option value="">Loading models...</option>
+                    </select>
+                    <button id="refreshModels" class="btn-secondary">↻ Refresh</button>
+                </div>
+
+                <div class="uncensored-models">
+                    <h3>Uncensored Models</h3>
+                    <ul id="uncensoredList">
+                        <li>Loading...</li>
+                    </ul>
+                    <div class="model-actions">
+                        <input type="text" id="newModelName" placeholder="Model name to pull">
+                        <button id="pullModel" class="btn-primary">Pull Model</button>
+                    </div>
+                </div>
+
+                <div class="settings">
+                    <h3>Settings</h3>
+                    <div class="setting-item">
+                        <label for="temperature">Temperature: <span id="tempValue">0.7</span></label>
+                        <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+                    </div>
+                    <div class="setting-item">
+                        <label for="systemPrompt">System Prompt</label>
+                        <textarea id="systemPrompt" rows="3" placeholder="Optional system prompt..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div id="chatMessages" class="chat-messages">
+                    <div class="welcome-message">
+                        <h2>Welcome to Ollama Cursor POC! 👋</h2>
+                        <p>This is an uncensored AI chat interface powered by Ollama.</p>
+                        <p>Select a model from the sidebar and start chatting!</p>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <textarea id="userInput" placeholder="Type your message here..." rows="3"></textarea>
+                    <div class="input-actions">
+                        <button id="sendBtn" class="btn-primary">Send</button>
+                        <button id="clearBtn" class="btn-secondary">Clear Chat</button>
+                        <label class="streaming-toggle">
+                            <input type="checkbox" id="streamingMode" checked>
+                            <span>Streaming Mode</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Connected to: <span id="connectionStatus" class="status-indicator">Checking...</span></p>
+            <p>Ollama Status: <span id="ollamaStatus" class="status-indicator">Checking...</span></p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
